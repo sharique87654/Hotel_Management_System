@@ -14,7 +14,7 @@ export default function Signup() {
         event.preventDefault(); // Prevent form from refreshing the page
 
         try {
-            const response = await axios.post('http://localhost:4000/', {
+            const response = await axios.post('http://localhost:3000/', {
                 firstname,
                 lastname,
                 email,

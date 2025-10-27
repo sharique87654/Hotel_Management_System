@@ -12,7 +12,7 @@ export default function AdminAuth() {
     const handleSubmit = async (e) => {
         e.preventDefault() // Prevent form from refreshing the page
         try {
-            const adimData = await axios.post('http://localhost:4000/admin/auth' , {
+            const adimData = await axios.post('http://localhost:3000/admin/auth' , {
                 adminName,
                 password
             })

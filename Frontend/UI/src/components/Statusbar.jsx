@@ -7,7 +7,7 @@ export const Statusbar = () => {
       const [luxury , setLuxury] = useState([])
 
       useEffect(()=>{
-        axios.get('http://localhost:4000/HotelApi/rooms')
+        axios.get('http://localhost:3000/HotelApi/rooms')
         .then((response)=>{
           const statusData = response.data
           

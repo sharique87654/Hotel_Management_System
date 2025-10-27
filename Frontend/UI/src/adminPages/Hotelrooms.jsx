@@ -13,7 +13,7 @@ export default function Hotelrooms() {
   async function hotelData(e){
     e.preventDefault() // Prevent form from refreshing the page
     try{
-      const handleHotelrooms = await axios.post('http://localhost:4000/admin/hotelroom' , {
+      const handleHotelrooms = await axios.post('http://localhost:3000/admin/hotelroom' , {
         roomName,
         description,
         price,

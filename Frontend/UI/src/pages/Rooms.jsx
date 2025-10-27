@@ -8,7 +8,7 @@ import axios from 'axios'
 export default function Booking() {
   const [data , setdata] = useState([])
   useEffect(()=>{
-      axios.get('http://localhost:4000/HotelApi/rooms')
+      axios.get('http://localhost:3000/HotelApi/rooms')
       .then((response)=>{
           setdata(response.data)
       })

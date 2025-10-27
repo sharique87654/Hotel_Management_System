@@ -14,7 +14,7 @@ export default function RoomsManagement() {
     }, []);
 
     function fetchRooms() {
-        axios.get('http://localhost:4000/HotelApi/rooms')
+        axios.get('http://localhost:3000/HotelApi/rooms')
             .then((response) => {
                 setData(response.data);
             });
@@ -22,7 +22,7 @@ export default function RoomsManagement() {
         
 
         function deleteHandle(roomName) {
-            axios.delete('http://localhost:4000/admin/roomDelete', {
+            axios.delete('http://localhost:3000/admin/roomDelete', {
                 data: { roomName : roomName } //  The `data` property is used to pass the request body. This sends { roomName: "Luxury Suite" } to the server
                 //For this backend setup, roomName needs to be sent in the body of the DELETE request. Since axios.delete doesn’t automatically send a request body like POST or PUT, we specify the data option to include it.
             } )
@@ -49,7 +49,7 @@ export default function RoomsManagement() {
     // console.log(roomId);
     
 
-    // axios.put(`http://localhost:4000/admin/roomUpdate/:${roomId}` , {
+    // axios.put(`http://localhost:3000/admin/roomUpdate/:${roomId}` , {
 
     // })
 
