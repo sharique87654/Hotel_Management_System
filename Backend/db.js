@@ -1,13 +1,17 @@
 const mongoose = require('mongoose')
-const { string } = require('zod')
+const dotenv = require('dotenv')
+dotenv.config()
 
-mongoose.connect('mongodb+srv://Practice:sharique123@practice.kkqhn.mongodb.net/MERA_HOTEL')
+
+
+mongoose.connect(process.env.MONGO_URL) 
 
 const Userschema = new mongoose.Schema({
     firstname : String,
     lastname : String,
     email : String,
-    password : String
+    password : String,
+    
 })
 
 const AdminSchema = new mongoose.Schema({
@@ -24,7 +28,7 @@ const RoomsData = new mongoose.Schema({
 
 })
 
-const signupdb = mongoose.model('Clients' , Userschema)
+const signupdb = mongoose.model('users' , Userschema)
 const admindb = mongoose.model('Admin' ,  AdminSchema)
 const roomdata = mongoose.model('Rooms' ,  RoomsData)
 

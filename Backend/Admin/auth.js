@@ -3,7 +3,9 @@ const router = express.Router();
 const zod = require('zod');
 const { admindb } = require('../db');
 const jwt = require('jsonwebtoken');
-const JwtCode = require('../Auth/config');
+const dotenv = require("dotenv")
+dotenv.config()
+
 
 const authValid = zod.object({
     adminName : zod.string().min(1),
@@ -32,7 +34,7 @@ router.use('/auth' , async function(req , res){
     const userId = foundUser._id
     const token = jwt.sign({
         userId
-    },JwtCode)
+    },process.env.jwtCode)
 
     return res.status(200).json({
         msg : "Admin succesfully logged in",

@@ -4,9 +4,12 @@ const { roomdata } = require('../db')
 
 const router = express.Router()
 
-
 const hotelInput = zod.object({
-    roomName : zod.string().min(1)
+    roomName : zod.string().min(1),
+    description : zod.string().min(1),
+    price : zod.string().min(1),
+    roomType : zod.string().min(1),
+    numberofbed : zod.string().min(1)
 
 })
 router.put('/roomUpdate/:id' , async function(req , res){
@@ -15,20 +18,24 @@ router.put('/roomUpdate/:id' , async function(req , res){
 
     if (!validUpdate.success){
         return res.status(411).json({
-            error : "SomeThing went wrong"
+            error : "Invalid input"
         })
     }
     
-    await roomdata.updateOne(
+    try {
+        await roomdata.updateOne(
         {_id : req.params.id} , 
         data
     )
+} catch (error) {
+    return res.status(500).json({
+        message : "Server error"
+    })
+}
 
     return res.status(200).json({
         message : "Update successful"
     })
 })
-
-
 
 module.exports = router

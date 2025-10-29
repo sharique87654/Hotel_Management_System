@@ -1,10 +1,10 @@
 const express = require("express")
 const router = express.Router();
 const zod = require("zod");
-const JwtCode = require("../config");
 const jwt = require('jsonwebtoken');
 const { signupdb } = require("../../db");
-
+const dotenv = require("dotenv")
+dotenv.config()
 
 
 const signinAuth = zod.object({
@@ -36,7 +36,7 @@ router.post('/signin' , async function(req , res){
 
     const token = jwt.sign({
         userId
-    }, JwtCode)
+    }, process.env.jwtCode)
 
     return res.status(200).json({
         message : "You have Succesfully logged in",

@@ -1,5 +1,6 @@
-const JwtCode = require("./config.js");
 const jwt = require('jsonwebtoken');
+const dotenv = require("dotenv")
+dotenv.config()
 
 const authMiddleware = (req , res , next)=>{
     const authHeader = req.headers.authorization;
@@ -12,7 +13,7 @@ const authMiddleware = (req , res , next)=>{
     const token = authHeader.split(' ')[1]
 
     try {
-        const decoded = jwt.verify(token, JwtCode)
+        const decoded = jwt.verify(token, process.env.JwtCode);
         req.dataId = decoded.userId  // req is use to pass data from middleware and dataId is like variable name and decoded.userId is we take userId which we sign it as a jwt 
         next()
     } catch (error) {
