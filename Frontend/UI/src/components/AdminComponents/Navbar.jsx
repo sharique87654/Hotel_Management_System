@@ -1,60 +1,74 @@
-export default function Navbar({onclick}) {
-    return (
-        <div>
-        <div className="flex h-screen flex-col justify-between border-e bg-white float-left ml-10 ">
-            <div className=" pt-32 mr-16">
-            <ul className="mt-6 space-y-4">
-                <li className="w-40">
-                <a
-                    href="#"
-                    className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-200"
-                >
-                    Account
-                </a>
-                </li>
-                <li className="w-40">
-                <a
-                    href="#"
-                    className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-200 "
-                >
-                    Booked
-                </a>
-                </li>
-                <li className="w-40">
-                <a
-                    href="/home/admin/adminpage/hotelrooms"
-                    className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-200 "
-                >
-                    Hotel Rooms
-                </a>
-                </li>
-                <li className="w-40">
-                <a
-                    href="/home/admin/adminpage/management"
-                    className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-200 "
-                >
-                    Management
-                </a>
-                </li>
+import { useNavigate } from "react-router-dom";
+import logo from "../../assets/main_logo.png";
 
-                <li>
-                <a
-                    href="#"
-                    className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-200 " onClick={onclick}
-                >
-                    Logout
-                </a>
-                </li>
-            </ul>
-            <br />
-            <br />
+export default function Navbar({ onclick }) {
+  const navigate = useNavigate();
+  return (
+    <div>
+      <div className="flex w-screen flex-row items-center justify-between bg-gradient-to-r from-gray-900 via-black to-gray-800 shadow-xl rounded-b-3xl py-4 px-10">
+        <div className="flex items-center">
+          <img
+            onClick={() => navigate("/home")}
+            src={logo}
+            alt="logo"
+            className="w-40 cursor-pointer"
+          />
+        </div>
+        <div className="flex items-center space-x-8">
+          <ul className="flex space-x-8">
+            <li>
+              <a
+                href="#"
+                className="text-sm font-semibold text-gray-300 hover:text-white transition duration-300 ease-in-out"
+              >
+                Account
+              </a>
+            </li>
 
-            <p className="bg-red-200 p-4 rounded-3xl">
-                <span className="text-yellow-950">Note:</span> Please Logout before
-                leave
-            </p>
-            </div>
+            <li>
+              <a
+                href="#"
+                className="text-sm font-semibold text-gray-300 hover:text-white transition duration-300 ease-in-out"
+              >
+                Booked
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="/home/admin/adminpage/hotelrooms"
+                className="text-sm font-semibold text-gray-300 hover:text-white transition duration-300 ease-in-out"
+              >
+                Hotel Rooms
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="/home/admin/adminpage/management"
+                className="text-sm font-semibold text-gray-300 hover:text-white transition duration-300 ease-in-out"
+              >
+                Management
+              </a>
+            </li>
+          </ul>
         </div>
+
+        {/* ✅ Right Section (Logout + Note) */}
+        <div className="flex items-center space-x-6">
+          <p className="bg-yellow-100/10 border border-yellow-600/30 px-4 py-2 rounded-2xl text-sm text-yellow-300 font-medium shadow-sm">
+            <span className="text-yellow-400 font-bold">Note:</span> Logout
+            before leaving
+          </p>
+          <a
+            href="/home"
+            onClick={onclick}
+            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition duration-300 ease-in-out"
+          >
+            Logout
+          </a>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

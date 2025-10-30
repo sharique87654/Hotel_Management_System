@@ -7,12 +7,11 @@ import Footer from "../components/Footer";
 export default function Home() {
   return (
     <div>
-        <Navbar/>
-        <Header/>
-        <Statusbar basic={48} luxury={90} total={138}/>
-        <VideoSection/>
-        <Footer/>
-
+      <Navbar />
+      <Header />
+      <Statusbar basic={48} luxury={90} total={138} />
+      <VideoSection />
+      <Footer />
     </div>
-  )
+  );
 }
