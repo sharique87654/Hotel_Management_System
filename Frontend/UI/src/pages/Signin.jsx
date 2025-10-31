@@ -14,7 +14,7 @@ export default function Signin() {
     event.preventDefault(); // Prevent form from refreshing the page
 
     try {
-      const response = await axios.post("http://localhost:3000/signin", {
+      const response = await axios.post("http://localhost:3000/api/signin", {
         email,
         password,
       });
