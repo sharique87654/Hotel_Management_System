@@ -2,64 +2,73 @@ import { useState } from "react";
 import logo from "../assets/main_logo.png";
 import { useNavigate } from "react-router-dom";
 
-
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-      // signout logic
-      function signout(){
-        localStorage.removeItem("Token");
-            navigate("/signin")
-      }
-
+  // signout logic
+  function signout() {
+    localStorage.removeItem("Token");
+    navigate("/signin");
+  }
 
   return (
-    <header className={`flex  w-full items-center bg-black dark:bg-dark bg-opacity-85`}>
-      <div className="container">
-        <div className="relative -mx-4 flex items-center justify-between">
-          <div className="w-60 max-w-full px-4 ">
-              <img
-                src={logo}
-                alt="logo"
-                className="hidden dark:block ml-14"
-              />
-          </div>
-          <div className="flex w-full items-center justify-between px-4">
-            <div>
-              <button
-                onClick={() => setOpen(!open)}
-                id="navbarToggler"
-                className={` ${
-                  open && "navbarTogglerActive"
-                } absolute right-4 top-1/2 block -translate-y-1/2 rounded-lg px-3 py-[6px] ring-primary focus:ring-2 lg:hidden`}
-              >
-                <span className="relative my-[6px] block h-[2px] w-[30px] bg-body-color dark:bg-white"></span>
-                <span className="relative my-[6px] block h-[2px] w-[30px] bg-body-color dark:bg-white"></span>
-                <span className="relative my-[6px] block h-[2px] w-[30px] bg-body-color dark:bg-white"></span>
-              </button>
-              <nav
-                // :className="!navbarOpen && 'hidden' "
-                id="navbarCollapse"
-                className={`absolute right-4 top-full w-full max-w-[250px] rounded-lg bg-white px-6 py-5 shadow dark:bg-dark-2 lg:static lg:block lg:w-full lg:max-w-full lg:shadow-none lg:dark:bg-transparent ${
-                  !open && "hidden"
-                } ml-32 `}
-              >
-                <ul className="block lg:flex">
-                  <ListItem NavLink="/home">Home</ListItem>
-                  <ListItem NavLink="/rooms">Rooms</ListItem>
-                  <ListItem NavLink="/contact">Contact</ListItem>
-                </ul>
-              </nav>
-            </div>
-            <div className="hidden justify-end pr-16 sm:flex lg:pr-0 bg-red-700 rounded-full ">
-                <button className="px-7 py-3 text-base font-medium text-dark hover:text-primary dark:text-white" onClick={signout}>
-                Signout
-                </button>
-            </div>
-          </div>
-        </div>
+    <header className="flex items-center justify-between w-full bg-black bg-opacity-85 dark:bg-dark px-8 py-4 shadow-md">
+      {/* ✅ Left: Logo */}
+      <div className="flex items-center">
+        <img
+          onClick={() => navigate("/home")}
+          src={logo}
+          alt="logo"
+          className="w-40 cursor-pointer hover:scale-105 transition-transform duration-300"
+        />
       </div>
+
+      {/* ✅ Center: Navigation */}
+      <nav className="hidden lg:flex space-x-10">
+        <ul className="flex items-center gap-8 text-white text-lg font-medium">
+          <ListItem NavLink="/home">Home</ListItem>
+          <ListItem NavLink="/rooms">Rooms</ListItem>
+          <ListItem NavLink="/contact">Contact</ListItem>
+          <ListItem NavLink="/home/admin">Admin</ListItem>
+        </ul>
+      </nav>
+
+      {/* ✅ Right: Logout Button */}
+      <div className="hidden sm:flex items-center">
+        <button
+          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-medium transition"
+          onClick={signout}
+        >
+          Sign Out
+        </button>
+      </div>
+
+      {/* ✅ Mobile Toggle Button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="lg:hidden flex flex-col justify-center items-center space-y-1 p-2"
+      >
+        <span className="block w-7 h-[2px] bg-white"></span>
+        <span className="block w-7 h-[2px] bg-white"></span>
+        <span className="block w-7 h-[2px] bg-white"></span>
+      </button>
+
+      {/* ✅ Mobile Menu */}
+      {open && (
+        <div className="absolute top-full left-0 w-full bg-black text-white flex flex-col items-center py-5 space-y-4 lg:hidden">
+          <ListItem NavLink="/home">Home</ListItem>
+          <ListItem NavLink="/rooms">Rooms</ListItem>
+          <ListItem NavLink="/contact">Contact</ListItem>
+          <ListItem NavLink="/home/admin">Admin</ListItem>
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition"
+            onClick={signout}
+          >
+            Sign Out
+          </button>
+        </div>
+      )}
     </header>
   );
 };
@@ -77,6 +86,6 @@ const ListItem = ({ children, NavLink }) => {
           {children}
         </a>
       </li>
-    </>
-  );
+    </>
+  );
 };
