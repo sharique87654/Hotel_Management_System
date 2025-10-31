@@ -4,7 +4,6 @@ import Swal from 'sweetalert2'
 
 export default function Contact() {
 
-
   const onSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);

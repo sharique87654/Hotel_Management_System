@@ -111,9 +111,12 @@ export default function Signin() {
                 {/* last  */}
             <p className="mt-10 text-center text-sm text-gray-300">
                 Dont have account?<Link to={'/'} className="text-blue-400 hover:text-indigo-400" > Sign up </Link>
+                <br />
+                <br />
+                <Link to={'/admin'} className="text-blue-400"> Admin</Link>
             </p>
             </div>
         </div>
-        </>
-    );
+        </>
+    );
 }

@@ -15,7 +15,7 @@ const Navbar = () => {
 
 
   return (
-    <header className={`flex w-full items-center bg-black dark:bg-dark bg-opacity-85`}>
+    <header className={`flex  w-full items-center bg-black dark:bg-dark bg-opacity-85`}>
       <div className="container">
         <div className="relative -mx-4 flex items-center justify-between">
           <div className="w-60 max-w-full px-4 ">
@@ -49,7 +49,6 @@ const Navbar = () => {
                   <ListItem NavLink="/home">Home</ListItem>
                   <ListItem NavLink="/rooms">Rooms</ListItem>
                   <ListItem NavLink="/contact">Contact</ListItem>
-                  <ListItem NavLink="/home/admin">Admin</ListItem>
                 </ul>
               </nav>
             </div>
@@ -78,6 +77,6 @@ const ListItem = ({ children, NavLink }) => {
           {children}
         </a>
       </li>
-    </>
-  );
+    </>
+  );
 };
