@@ -9,7 +9,7 @@ export default function BookingSection() {
   return (
     <div>
       <Navbar />
-      <div className="container mx-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="container mx-auto p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left Side: Hotel Info  */}
 
         <div>
@@ -79,7 +79,7 @@ export default function BookingSection() {
 
         {/* Right Side: Booking Section  */}
 
-        <div className="bg-white shadow-md rounded-lg p-24 h-[30rem] w-[45rem] ml-[6.25rem] mt-[7.5rem]">
+        <div className="bg-white shadow-md rounded-lg p-14 h-[30rem] w-[30rem] ml-[6.25rem] mt-[7.5rem]">
           <div className="text-lg font-bold mb-4">
             <span className="line-through font-semibold text-2xl">$12,999</span>
             <span className="text-green-600 font-semibold text-2xl">

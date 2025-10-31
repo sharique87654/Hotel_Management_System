@@ -1,11 +1,11 @@
 import headerImg from "../assets/homeImg2.jpg";
 import { Navigate } from "react-router-dom";
 export const Header = () => {
-  const isAuthenticated = localStorage.getItem("isLoggedIn");
+  // const isAuthenticated = localStorage.getItem("isLoggedIn");
 
-  if (!isAuthenticated) {
-    return <Navigate to="/Signin" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/Signin" replace />;
+  // }
   return (
     <div className="relative flex flex-col-reverse py-16 lg:pt-0 lg:flex-col lg:pb-0 bg-gradient-to-br from-slate-900 via-sky-900 to-slate-800 text-white overflow-hidden">
       <div className="inset-y-0 top-0 right-0 z-0 w-auto max-w-xl px-4 mx-auto md:px-0 lg:pr-0 lg:mb-0 lg:mx-0 lg:w-6/12 lg:max-w-full lg:absolute xl:px-0">

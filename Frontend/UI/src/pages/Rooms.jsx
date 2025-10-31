@@ -91,7 +91,7 @@ export default function Booking() {
           <hr className="border-none h-[2px] w-auto bg-gray-800 mb-8" />
 
           {/* Room Cards Grid */}
-          <div className="grid grid-flow-row grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-flow-row grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
             {filteredData.length > 0 ? (
               filteredData.map((element) => (
                 <Cards

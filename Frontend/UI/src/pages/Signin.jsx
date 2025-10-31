@@ -18,8 +18,10 @@ export default function Signin() {
         email,
         password,
       });
+      console.log(response);
 
       if (response.status === 200) {
+        console.log("Navigating to /home...");
         localStorage.setItem("Token", response.data.token);
         navigate("/home");
       }

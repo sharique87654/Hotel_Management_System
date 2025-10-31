@@ -30,7 +30,7 @@ const Navbar = () => {
           <ListItem NavLink="/home">Home</ListItem>
           <ListItem NavLink="/rooms">Rooms</ListItem>
           <ListItem NavLink="/contact">Contact</ListItem>
-          <ListItem NavLink="/home/admin">Admin</ListItem>
+          {/* <ListItem NavLink="/home/admin">Admin</ListItem> */}
         </ul>
       </nav>
 
@@ -60,7 +60,7 @@ const Navbar = () => {
           <ListItem NavLink="/home">Home</ListItem>
           <ListItem NavLink="/rooms">Rooms</ListItem>
           <ListItem NavLink="/contact">Contact</ListItem>
-          <ListItem NavLink="/home/admin">Admin</ListItem>
+          {/* <ListItem NavLink="/home/admin">Admin</ListItem> */}
           <button
             className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition"
             onClick={signout}

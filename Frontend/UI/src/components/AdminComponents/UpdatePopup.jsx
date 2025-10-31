@@ -1,4 +1,6 @@
+import axios from "axios";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export default function UpdatePopup() {
   const [roomName, setroomName] = useState("");
@@ -6,6 +8,38 @@ export default function UpdatePopup() {
   const [price, setprice] = useState("");
   const [roomType, setroomType] = useState("");
   const [numberofbed, setnumberofbed] = useState("");
+
+  async function hotelData(e) {
+    e.preventDefault(); // Prevent form from refreshing the page
+    try {
+      const handleHotelrooms = await axios.post(
+        "http://localhost:3000/admin/hotelroom",
+        {
+          roomName,
+          description,
+          price,
+          roomType,
+          numberofbed,
+        }
+      );
+      if (handleHotelrooms.status === 200) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Room has been Published",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
+      });
+      console.log(error);
+    }
+  }
   return (
     <div>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
@@ -18,9 +52,9 @@ export default function UpdatePopup() {
               </h2>
 
               {/* Name input */}
-              <label className="block mb-2 text-sm font-semibold text-gray-800">
+              {/* <label className="block mb-2 text-sm font-semibold text-gray-800">
                 Name
-              </label>
+              </label> */}
               <input
                 type="text"
                 onChange={(e) => setroomName(e.target.value)}

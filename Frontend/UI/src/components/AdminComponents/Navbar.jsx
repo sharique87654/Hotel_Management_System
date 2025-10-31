@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/main_logo.png";
 
-export default function Navbar({ onclick }) {
+export default function Navbar() {
   const navigate = useNavigate();
   return (
     <div>
@@ -18,10 +18,10 @@ export default function Navbar({ onclick }) {
           <ul className="flex space-x-8">
             <li>
               <a
-                href="#"
+                href="/home/admin/adminpage/adminDashboard"
                 className="text-sm font-semibold text-gray-300 hover:text-white transition duration-300 ease-in-out"
               >
-                Account
+                Dashboard
               </a>
             </li>
 
@@ -61,7 +61,7 @@ export default function Navbar({ onclick }) {
             before leaving
           </p>
           <a
-            href="/home"
+            href="/home/admin"
             onClick={onclick}
             className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition duration-300 ease-in-out"
           >
