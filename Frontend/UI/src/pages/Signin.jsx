@@ -1,14 +1,21 @@
 import logo from "../assets/main_logo.png";
 import { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-export default function Signin() {
+export default function Signin({
+  roomName,
+  description,
+  roomType,
+  price,
+  noOfBed,
+}) {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent form from refreshing the page
@@ -21,10 +28,19 @@ export default function Signin() {
       console.log(response);
 
       if (response.status === 200) {
-        console.log("Navigating to /home...");
-        localStorage.setItem("Token", response.data.token);
-        navigate("/home");
+        localStorage.setItem("isLoggedIn", true);
+        const pathname = localStorage.getItem("path");
+        console.log(pathname);
+
+        if (pathname) {
+          console.log("mji");
+
+          navigate(pathname);
+        } else {
+          navigate("/");
+        }
       }
+      console.log(response, "RESPONSE");
     } catch (error) {
       if (error.response.status === 411) {
         setMessage({ text: "Wrong input", type: "error" });
@@ -130,7 +146,7 @@ export default function Signin() {
           <p className="mt-8 text-center text-sm text-gray-300">
             Don’t have an account?{" "}
             <Link
-              to={"/"}
+              to={"/signin"}
               className="text-sky-400 font-semibold hover:underline"
             >
               Sign up

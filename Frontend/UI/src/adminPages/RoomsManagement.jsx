@@ -7,7 +7,7 @@ import Modal from "../components/AdminComponents/Modal";
 
 export default function RoomsManagement() {
   const [data, setData] = useState([]);
-  const [selectedRoom, setSelectedRoom] = useState(null); 
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   // Fetch rooms from backend
@@ -84,11 +84,13 @@ export default function RoomsManagement() {
         <RoomTable
           key={element._id}
           roomName={element.roomName}
+          description={element.description}
           roomType={element.roomType}
+          numberofbed={element.numberofbed}
           price={element.price}
           onEdit={() => {
-            setSelectedRoom(element); 
-            setModalOpen(true); 
+            setSelectedRoom(element);
+            setModalOpen(true);
           }}
           clickDelete={() => deleteHandle(element.roomName)}
         />

@@ -8,6 +8,7 @@ export default function Hotelrooms() {
   const [roomName, setroomName] = useState("");
   const [description, setdescription] = useState("");
   const [price, setprice] = useState("");
+  const [img, setImg] = useState("");
   const [roomType, setroomType] = useState("");
   const [numberofbed, setnumberofbed] = useState("");
 
@@ -20,6 +21,7 @@ export default function Hotelrooms() {
           roomName,
           description,
           price,
+          img,
           roomType,
           numberofbed,
         }
@@ -55,9 +57,8 @@ export default function Hotelrooms() {
       ></Suspense>
 
       <form className="max-w-sm mx-auto">
-        <br />
-        <br />
-        <br />
+       
+        
         {/* Name input */}
         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
           Name
@@ -110,6 +111,9 @@ export default function Hotelrooms() {
         <input
           className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           type="file"
+          onChange={(e) => {
+            setImg(e.target.value);
+          }}
         />
 
         {/* Room type input */}
