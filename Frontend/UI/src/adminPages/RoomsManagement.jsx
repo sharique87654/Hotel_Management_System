@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import RoomTable from "../components/AdminComponents/RoomTable";
-import Navbar from "../components/AdminComponents/Navbar";
 import Swal from "sweetalert2";
+import Navbar from "../components/AdminComponents/Navbar";
+import RoomTable from "../components/AdminComponents/RoomTable";
 import Modal from "../components/AdminComponents/Modal";
 
 export default function RoomsManagement() {
@@ -10,7 +10,7 @@ export default function RoomsManagement() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Fetch all rooms
+  // ✅ Fetch all rooms
   useEffect(() => {
     fetchRooms();
   }, []);
@@ -20,11 +20,11 @@ export default function RoomsManagement() {
       const res = await axios.get("http://localhost:3000/HotelApi/rooms");
       setData(res.data);
     } catch (err) {
-      console.error("Error fetching rooms:", err);
+      console.error("❌ Error fetching rooms:", err);
     }
   };
 
-  // Delete room
+  // ✅ Delete room
   const deleteHandle = async (roomName) => {
     try {
       await axios.delete("http://localhost:3000/admin/roomDelete", {
@@ -33,7 +33,7 @@ export default function RoomsManagement() {
 
       Swal.fire({
         icon: "success",
-        title: "Room deleted successfully",
+        title: "Room deleted successfully!",
         timer: 1500,
         showConfirmButton: false,
       });
@@ -49,43 +49,11 @@ export default function RoomsManagement() {
     }
   };
 
-  // Save updated room
-  const handleSave = async (updatedRoom) => {
-    if (!updatedRoom || !updatedRoom._id) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Data",
-        text: "Room ID not found!",
-      });
-      return;
-    }
-
-    try {
-      const newRoom = { ...updatedRoom };
-      delete newRoom._id; // 🔥 remove existing id
-
-      console.log("📤 Data being sent to backend:", newRoom);
-
-      await axios.post("http://localhost:3000/admin/add-room", newRoom);
-
-      Swal.fire({
-        icon: "success",
-        title: "Room added successfully!",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-
-      setModalOpen(false);
-      setSelectedRoom(null);
-      fetchRooms();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Add Failed",
-        text: "Something went wrong while adding the room!",
-      });
-      console.error(error);
-    }
+  // ✅ Handle save from modal
+  const handleSave = async (newRoom) => {
+    fetchRooms(); // refresh list
+    setModalOpen(false);
+    setSelectedRoom(null);
   };
 
   const handleEditClick = (room) => {
@@ -93,11 +61,25 @@ export default function RoomsManagement() {
     setModalOpen(true);
   };
 
+  const handleAddClick = () => {
+    setSelectedRoom(null);
+    setModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="mt-6 space-y-4">
+      <div className="flex justify-end p-4">
+        <button
+          onClick={handleAddClick}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
+        >
+          + Add New Room
+        </button>
+      </div>
+
+      <div className="mt-4 space-y-4">
         {data.map((room) => (
           <RoomTable
             key={room._id}

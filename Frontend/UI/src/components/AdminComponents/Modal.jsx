@@ -12,60 +12,68 @@ export default function Modal({ roomData, onClose, onSave }) {
     if (roomData) setFormData(roomData);
   }, [roomData]);
 
-  if (!formData) return null;
-
-  // 🧠 Handle text input fields
+  // ✅ Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🧠 Handle image selection
+  // ✅ Handle image file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
-      setUploadPreview(URL.createObjectURL(file));
+      setUploadPreview(URL.createObjectURL(file)); // for preview
     }
   };
 
-  // 🚀 Handle form submit
+  // ✅ Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setUploading(true);
 
     try {
-      setUploading(true);
+      let res;
 
-      const data = new FormData();
+      // If no new image, send JSON payload
+      if (!selectedFile) {
+        const jsonData = {
+          roomName: formData.roomName,
+          description: formData.description,
+          price: formData.price,
+          roomType: formData.roomType,
+          numberofbed: formData.numberofbed,
+          imageUrl: formData.imageUrl || "",
+        };
 
-      // 🧩 Attach file only if selected
-      if (selectedFile) {
+        console.log("📤 Sending JSON to backend:", jsonData);
+
+        res = await axios.post(
+          "http://localhost:3000/admin/add-room",
+          jsonData,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      } else {
+        // Otherwise, use multipart/form-data for file upload
+        const data = new FormData();
         data.append("roomImage", selectedFile);
-      }
+        data.append("roomName", formData.roomName);
+        data.append("description", formData.description);
+        data.append("price", formData.price);
+        data.append("roomType", formData.roomType);
+        data.append("numberofbed", formData.numberofbed);
 
-      // Attach all other fields
-      data.append("roomName", formData.roomName || "");
-      data.append("description", formData.description || "");
-      data.append("price", formData.price || "");
-      data.append("roomType", formData.roomType || "");
-      data.append("numberofbed", formData.numberofbed || "");
+        console.log("📤 Sending multipart data to backend:", {
+          ...formData,
+          roomImage: selectedFile.name,
+        });
 
-      console.log("📤 Sending multipart data to backend:", {
-        ...formData,
-        roomImage: selectedFile ? selectedFile.name : "No new file",
-      });
-
-      // ✅ Send to backend
-      const res = await axios.post(
-        "http://localhost:3000/admin/add-room",
-        data,
-        {
+        res = await axios.post("http://localhost:3000/admin/add-room", data, {
           headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+        });
+      }
 
       console.log("✅ Room added successfully:", res.data);
 
@@ -76,8 +84,8 @@ export default function Modal({ roomData, onClose, onSave }) {
         showConfirmButton: false,
       });
 
-      if (onSave) onSave();
-      if (onClose) onClose();
+      onSave(res.data.room); // refresh parent
+      onClose(); // close modal
     } catch (error) {
       console.error("❌ Error adding room:", error);
       Swal.fire({
@@ -89,6 +97,8 @@ export default function Modal({ roomData, onClose, onSave }) {
       setUploading(false);
     }
   };
+
+  if (!formData) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
@@ -141,7 +151,7 @@ export default function Modal({ roomData, onClose, onSave }) {
             required
           />
 
-          {/* Number of Beds */}
+          {/* Beds */}
           <label className="block mb-2 font-medium">Number of Beds</label>
           <input
             name="numberofbed"
@@ -153,7 +163,7 @@ export default function Modal({ roomData, onClose, onSave }) {
             required
           />
 
-          {/* Room Image Upload */}
+          {/* Image Upload */}
           <label className="block mb-2 font-medium">Room Image</label>
           <div className="flex items-center gap-3 mb-3">
             {uploadPreview ? (
@@ -165,7 +175,7 @@ export default function Modal({ roomData, onClose, onSave }) {
             ) : formData.imageUrl ? (
               <img
                 src={formData.imageUrl}
-                alt="Existing Room"
+                alt="Current Room"
                 className="w-20 h-20 object-cover rounded-lg border"
               />
             ) : (
