@@ -5,19 +5,45 @@ import { useNavigate } from "react-router-dom";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
 
   // signout logic
   function signout() {
     localStorage.removeItem("Token");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("path");
     navigate("/signin");
   }
+
+  const AuthButtons = () => {
+    if (isLoggedIn) {
+      return (
+        <button
+          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-medium transition"
+          onClick={signout}
+        >
+          Sign Out
+        </button>
+      );
+    } else {
+      return (
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition"
+          // Changed to direct window navigation to eliminate hook dependency
+          onClick={() => navigate("/signin")}
+        >
+          Sign In
+        </button>
+      );
+    }
+  };
 
   return (
     <header className="flex items-center justify-between w-full bg-black bg-opacity-85 dark:bg-dark px-8 py-4 shadow-md">
       {/* ✅ Left: Logo */}
       <div className="flex items-center">
         <img
-          onClick={() => navigate("/home")}
+          onClick={() => navigate("/")}
           src={logo}
           alt="logo"
           className="w-40 cursor-pointer hover:scale-105 transition-transform duration-300"
@@ -27,7 +53,7 @@ const Navbar = () => {
       {/* ✅ Center: Navigation */}
       <nav className="hidden lg:flex space-x-10">
         <ul className="flex items-center gap-8 text-white text-lg font-medium">
-          <ListItem NavLink="/home">Home</ListItem>
+          <ListItem NavLink="/">Home</ListItem>
           <ListItem NavLink="/rooms">Rooms</ListItem>
           <ListItem NavLink="/contact">Contact</ListItem>
           {/* <ListItem NavLink="/home/admin">Admin</ListItem> */}
@@ -36,12 +62,7 @@ const Navbar = () => {
 
       {/* ✅ Right: Logout Button */}
       <div className="hidden sm:flex items-center">
-        <button
-          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-medium transition"
-          onClick={signout}
-        >
-          Sign Out
-        </button>
+        <AuthButtons />
       </div>
 
       {/* ✅ Mobile Toggle Button */}
@@ -61,6 +82,12 @@ const Navbar = () => {
           <ListItem NavLink="/rooms">Rooms</ListItem>
           <ListItem NavLink="/contact">Contact</ListItem>
           {/* <ListItem NavLink="/home/admin">Admin</ListItem> */}
+          <button
+            className="bg-blue-700 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition"
+            onClick={navigate("/signin")}
+          >
+            Sign In
+          </button>
           <button
             className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition"
             onClick={signout}

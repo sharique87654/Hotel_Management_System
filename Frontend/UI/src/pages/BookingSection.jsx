@@ -1,10 +1,27 @@
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-export default function BookingSection() {
+export default function BookingSection({roomName, noOfBed, description, price}) {
   const location = useLocation();
-  const { roomName, noOfBed, description, price } = location.state; // we can do "const room = location.state.roomName "
+  // const { roomName, noOfBed, description, price } = location.state; // we can do "const room = location.state.roomName "
   const navigate = useNavigate();
+  const pathname = location.pathname;
+  console.log(pathname,"PATHHHHHH");
+  
+  if (pathname) {
+    localStorage.setItem("path", pathname);
+  }
+
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+  const handleclick = () => {
+    if (!isLoggedIn) {
+      // Redirect to login and remember the target page
+      navigate("/signin");
+    } else {
+      navigate("/rooms/booked");
+    }
+  };
 
   return (
     <div>
@@ -128,7 +145,7 @@ export default function BookingSection() {
           </div>
 
           <button
-            onClick={() => navigate("/booked")}
+            onClick={handleclick}
             className="bg-green-600 text-white w-full py-3 rounded-md hover:bg-green-700 font-bold text-xl"
           >
             Book Now

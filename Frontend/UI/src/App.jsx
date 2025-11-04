@@ -3,6 +3,7 @@ import { Suspense, lazy } from "react";
 import Loading from "./components/Loading";
 import Booked from "./pages/Booked";
 import AdminDashboard from "./adminPages/AdminDashboard";
+import PrivateRoute from "./components/PrivateRoute";
 const RoomsManagement = lazy(() => import("./adminPages/RoomsManagement"));
 const BookingSection = lazy(() => import("./pages/BookingSection"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -21,12 +22,20 @@ function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             {/* Unprotected Routes */}
-            <Route path="/" element={<Signup />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
 
-            {/* Protected Routes */}
-            <Route path="/booked" element={<Booked />} />
-            <Route path="/home" element={<Home />} />
+            <Route
+              path="/rooms/booked"
+              element={
+                <PrivateRoute>
+                  <Booked />
+                </PrivateRoute>
+              }
+            />
+
+            {/* <Route path="" element={<Booked />} /> */}
+            <Route path="/" element={<Home />} />
             <Route path="/rooms" element={<Booking />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/rooms/roomsBooking" element={<BookingSection />} />

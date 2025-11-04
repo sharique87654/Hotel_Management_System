@@ -1,16 +1,21 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import axios from "axios";
 import Loading from "../components/Loading";
+import { useLocation } from "react-router-dom";
 
 // Lazy-loaded components
 const Cards = lazy(() => import("../components/cards"));
 const Navbar = lazy(() => import("../components/Navbar"));
 const Footer = lazy(() => import("../components/Footer"));
 
+
 export default function Booking() {
   const [data, setData] = useState([]); // All rooms
   const [filteredData, setFilteredData] = useState([]); // Filtered rooms
   const [search, setSearch] = useState(""); // Search input
+
+//   const Location = useLocation();
+// console.log(Location, "PathName");
 
   // 🧠 Fetch rooms from backend
   useEffect(() => {
