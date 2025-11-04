@@ -36,7 +36,7 @@ router.post('/signin' , async function(req , res){
 
     const token = jwt.sign({
         userId
-    }, process.env.jwtCode)
+    }, process.env.JwtCode)
 
     return res.status(200).json({
         message : "You have Succesfully logged in",

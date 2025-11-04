@@ -5,19 +5,23 @@ dotenv.config()
 const authMiddleware = (req , res , next)=>{
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')){
-        res.status(411).json({
-            message : "Invalid Signature"
+        return res.status(411).json({
+            message : "Token missing or invalid format"
         })
     }
 
-    const token = authHeader.split(' ')[1]
+    const token = authHeader.split(' ')[1];
+
+    console.log(" Received Token:", token);
+    console.log(" Secret Key from .env:", process.env.JwtCode);
 
     try {
         const decoded = jwt.verify(token, process.env.JwtCode);
-        req.dataId = decoded.userId  // req is use to pass data from middleware and dataId is like variable name and decoded.userId is we take userId which we sign it as a jwt 
-        next()
+        console.log(" Decoded Payload:", decoded);
+        req.dataId = decoded.userId;
+        next();
     } catch (error) {
-        console.error("JWT verification failed:", error);
+        console.error(" JWT verification failed:", error.message);
         return res.status(403).json({
             msg : "Invalid Signature"
         })
