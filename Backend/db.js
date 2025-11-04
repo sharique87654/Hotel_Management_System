@@ -23,43 +23,37 @@ const RoomsData = new mongoose.Schema({
   roomType: String,
   numberofbed: Number,
   imageUrl: String,
-  cloudinary_id: String, 
-
-
-  //   isBooked: { type: Boolean, default: false }
-  
+  cloudinary_id: String,
+  isBooked: { type: Boolean, default: false },
 });
 
 // ==================== BOOKING MODEL ====================
-// const BookingSchema = new mongoose.Schema({
-//   userId: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: 'users',
-//     required: true
-//   },
-//   roomId: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: 'Rooms',
-//     required: true
-//   },
-//   checkInDate: { type: Date, required: true },
-//   checkOutDate: { type: Date, required: true },
-//   guests: { type: Number, required: true },
-//   totalPrice: { type: Number, required: true },
-//   createdAt: { type: Date, default: Date.now }
-// });
-
-
-
+const BookingSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+    required: true,
+  },
+  roomId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Rooms",
+    required: true,
+  },
+  checkInDate: { type: Date, required: true },
+  checkOutDate: { type: Date, required: true },
+  guests: { type: Number, required: true },
+  totalPrice: { type: Number, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
 
 const signupdb = mongoose.model("users", Userschema);
 const admindb = mongoose.model("Admin", AdminSchema);
 const roomdata = mongoose.model("Rooms", RoomsData);
-// const bookingdb = mongoose.model('BookedRooms', BookingSchema);
+const bookingdb = mongoose.model('BookedRooms', BookingSchema);
 
 module.exports = {
   signupdb,
   admindb,
   roomdata,
-  //   bookingdb
+  bookingdb,
 };
