@@ -20,7 +20,7 @@ export default function Booking() {
   // 🧠 Fetch rooms from backend
   useEffect(() => {
     axios
-      .get("http://localhost:3000/HotelApi/rooms")
+      .get("http://localhost:3000/HotelApi/rooms")  
       .then((response) => {
         console.log("Fetched Data:", response.data);
         setData(response.data);
@@ -103,6 +103,7 @@ export default function Booking() {
                   key={element._id}
                   roomName={element.roomName}
                   description={element.description}
+                  image={element.imageUrl}
                   roomType={element.roomType}
                   price={element.price}
                   noOfBed={element.numberofbed}

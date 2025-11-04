@@ -4,13 +4,7 @@ import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-export default function Signin({
-  roomName,
-  description,
-  roomType,
-  price,
-  noOfBed,
-}) {
+export default function Signin() {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [message, setMessage] = useState("");
@@ -18,7 +12,7 @@ export default function Signin({
   const location = useLocation();
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent form from refreshing the page
+    event.preventDefault();
 
     try {
       const response = await axios.post("http://localhost:3000/api/signin", {

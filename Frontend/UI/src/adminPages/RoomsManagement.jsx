@@ -10,96 +10,116 @@ export default function RoomsManagement() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Fetch rooms from backend
+  // Fetch all rooms
   useEffect(() => {
     fetchRooms();
   }, []);
 
-  function fetchRooms() {
-    axios
-      .get("http://localhost:3000/HotelApi/rooms")
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((error) => console.error(error));
-  }
+  const fetchRooms = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/HotelApi/rooms");
+      setData(res.data);
+    } catch (err) {
+      console.error("Error fetching rooms:", err);
+    }
+  };
 
   // Delete room
-  function deleteHandle(roomName) {
-    axios
-      .delete("http://localhost:3000/admin/roomDelete", {
-        data: { roomName },
-      })
-      .then(() => {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Room has been deleted",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        fetchRooms(); // refresh list
-      })
-      .catch(() => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
-        });
-      });
-  }
-
-  // Save edited room (PUT request)
-  async function handleSave(updatedRoom) {
+  const deleteHandle = async (roomName) => {
     try {
-      await axios.put(
-        `http://localhost:3000/HotelApi/rooms/${updatedRoom._id}`,
-        updatedRoom
-      );
+      await axios.delete("http://localhost:3000/admin/roomDelete", {
+        data: { roomName },
+      });
 
       Swal.fire({
         icon: "success",
-        title: "Room updated successfully",
+        title: "Room deleted successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      fetchRooms();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Delete Failed",
+        text: "Something went wrong while deleting the room!",
+      });
+      console.error(error);
+    }
+  };
+
+  // Save updated room
+  const handleSave = async (updatedRoom) => {
+    if (!updatedRoom || !updatedRoom._id) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Data",
+        text: "Room ID not found!",
+      });
+      return;
+    }
+
+    try {
+      const newRoom = { ...updatedRoom };
+      delete newRoom._id; // 🔥 remove existing id
+
+      console.log("📤 Data being sent to backend:", newRoom);
+
+      await axios.post("http://localhost:3000/admin/add-room", newRoom);
+
+      Swal.fire({
+        icon: "success",
+        title: "Room added successfully!",
         timer: 1500,
         showConfirmButton: false,
       });
 
       setModalOpen(false);
       setSelectedRoom(null);
-      fetchRooms(); // refresh list
+      fetchRooms();
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Update Failed",
-        text: "Something went wrong while updating the room!",
+        title: "Add Failed",
+        text: "Something went wrong while adding the room!",
       });
       console.error(error);
     }
-  }
+  };
+
+  const handleEditClick = (room) => {
+    setSelectedRoom({ ...room });
+    setModalOpen(true);
+  };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      {data.map((element) => (
-        <RoomTable
-          key={element._id}
-          roomName={element.roomName}
-          description={element.description}
-          roomType={element.roomType}
-          numberofbed={element.numberofbed}
-          price={element.price}
-          onEdit={() => {
-            setSelectedRoom(element);
-            setModalOpen(true);
-          }}
-          clickDelete={() => deleteHandle(element.roomName)}
-        />
-      ))}
+
+      <div className="mt-6 space-y-4">
+        {data.map((room) => (
+          <RoomTable
+            key={room._id}
+            roomName={room.roomName}
+            description={room.description}
+            image={room.imageUrl}
+            roomType={room.roomType}
+            numberofbed={room.numberofbed}
+            price={room.price}
+            onEdit={() => handleEditClick(room)}
+            clickDelete={() => deleteHandle(room.roomName)}
+          />
+        ))}
+      </div>
 
       {modalOpen && (
         <Modal
           roomData={selectedRoom}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedRoom(null);
+          }}
           onSave={handleSave}
         />
       )}
