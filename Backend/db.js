@@ -46,6 +46,8 @@ const BookingSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+
+
 const signupdb = mongoose.model("users", Userschema);
 const admindb = mongoose.model("Admin", AdminSchema);
 const roomdata = mongoose.model("Rooms", RoomsData);

@@ -56,4 +56,29 @@ router.post("/book/:roomId", authMiddleware, async (req, res) => {
     }
 });
 
+
+router.get("/mybookings", authMiddleware, async (req, res) => {
+    try {
+        const bookings = await bookingdb
+            .find({ userId: req.userId })
+            .populate("roomId", "roomName roomType price numberofbed imageUrl") // Select specific fields
+            .populate("userId", "firstname lastname email") // Get user info
+            .exec();
+
+        if (!bookings.length) {
+            return res.status(404).json({ msg: "No bookings found" });
+        }
+
+        res.status(200).json({
+            success: true,
+            count: bookings.length,
+            data: bookings
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+
 module.exports = router;
