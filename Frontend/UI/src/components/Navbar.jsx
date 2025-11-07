@@ -27,7 +27,7 @@ const Navbar = () => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        console.log(decoded, "decoded data");
+        //(decoded, "decoded data");
 
         // Use decoded.name or fallback to decoded.email or "User"
         setName(decoded.name || "User");

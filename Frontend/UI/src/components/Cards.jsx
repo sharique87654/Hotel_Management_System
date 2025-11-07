@@ -12,7 +12,7 @@ export default function Cards({
   const navigate = useNavigate();
 
   const handleMoreDetailClick = () => {
-    console.log("🏨 Viewing room details:", { roomId, roomName });
+    //("🏨 Viewing room details:", { roomId, roomName });
     navigate("/rooms/roomsBooking", {
       state: { roomId, roomName, description, roomType, price, noOfBed, image },
     });

@@ -8,7 +8,7 @@ const { roomdata } = require("../db");
 // ✅ Route: Add room with image upload
 router.post("/add-room", upload.single("roomImage"), async (req, res) => {
   try {
-    console.log("Request received to /admin/add-room");
+    //("Request received to /admin/add-room");
 
     // Check if file is uploaded
     if (!req.file) {
@@ -38,8 +38,8 @@ router.post("/add-room", upload.single("roomImage"), async (req, res) => {
         });
 
         await room.save();
-        console.log("Room added:", room);
-        return res.status(201).json({msg: "Room added successfully", room});
+        //("Room added:", room);
+        return res.status(201).json({ msg: "Room added successfully", room });
       }
     );
 

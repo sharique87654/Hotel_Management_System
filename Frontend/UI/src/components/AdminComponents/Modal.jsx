@@ -64,7 +64,7 @@ export default function Modal({ roomData, onClose, onSave }) {
         data.append("roomType", formData.roomType);
         data.append("numberofbed", formData.numberofbed);
 
-        console.log("📤 Sending multipart data to backend:", {
+        //("📤 Sending multipart data to backend:", {
           ...formData,
           roomImage: selectedFile.name,
         });

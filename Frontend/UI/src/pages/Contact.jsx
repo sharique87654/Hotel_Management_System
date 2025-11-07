@@ -26,7 +26,7 @@ export default function Contact() {
       });
       event.target.reset();
     } else {
-      console.log("Error", data);
+      //("Error", data);
       Swal.fire({
         icon: "error",
         title: "Oops...",

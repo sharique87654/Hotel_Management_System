@@ -23,8 +23,8 @@ export default function BookingSection() {
   const handleBooking = async (e) => {
     e.preventDefault();
 
-    console.log("🎫 Booking process started");
-    console.log("📝 Booking details:", {
+    ("🎫 Booking process started");
+    ("📝 Booking details:", {
       roomId,
       roomName,
       checkInDate,
@@ -64,7 +64,7 @@ export default function BookingSection() {
     setLoading(true);
 
     try {
-      console.log("📤 Sending booking request to backend...");
+      //("📤 Sending booking request to backend...");
 
       const totalGuests = parseInt(adults) + parseInt(children);
 
@@ -83,7 +83,7 @@ export default function BookingSection() {
         }
       );
 
-      console.log("✅ Booking successful:", response.data);
+      //("✅ Booking successful:", response.data);
 
       if (response.status === 200) {
         Swal.fire({

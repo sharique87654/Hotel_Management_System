@@ -19,18 +19,14 @@ export default function Signin() {
         email,
         password,
       });
-      console.log(response,"asdfghjhgfgh");
-      
+      //(response,"asdfghjhgfgh");
 
       if (response.status === 200) {
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("token", response.data.token);
         const pathname = localStorage.getItem("path");
-       
 
         if (pathname) {
-          
-
           navigate(pathname);
         } else {
           navigate("/");

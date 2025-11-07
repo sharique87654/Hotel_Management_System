@@ -66,7 +66,7 @@ export default function Hotelrooms() {
         title: "Oops...",
         text: "Something went wrong while uploading!",
       });
-      console.log("Upload error:", error);
+      //("Upload error:", error);
     }
   }
 

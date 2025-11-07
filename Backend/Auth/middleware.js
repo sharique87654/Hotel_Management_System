@@ -12,13 +12,13 @@ const authMiddleware = (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  console.log(" Received Token:", token);
-  console.log(" Secret Key from .env:", process.env.JwtCode);
+  //(" Received Token:", token);
+  //(" Secret Key from .env:", process.env.JwtCode);
 
   try {
-    console.log("hi from middleware");
+    //("hi from middleware");
     const decoded = jwt.verify(token, process.env.JwtCode);
-    console.log(" Decoded Payload:", decoded);
+    //(" Decoded Payload:", decoded);
     req.dataId = decoded.userId;
     next();
   } catch (error) {

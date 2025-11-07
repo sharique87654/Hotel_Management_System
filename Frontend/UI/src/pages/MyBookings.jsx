@@ -24,7 +24,7 @@ export default function MyBookings() {
   }, []);
 
   const fetchBookings = async () => {
-    console.log("🔄 Fetching user bookings...");
+    //("🔄 Fetching user bookings...");
     const token = localStorage.getItem("token");
 
     try {
@@ -36,7 +36,7 @@ export default function MyBookings() {
           },
         }
       );
-      console.log("✅ Bookings fetched:", response.data);
+      //("✅ Bookings fetched:", response.data);
       setBookings(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -50,7 +50,7 @@ export default function MyBookings() {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    console.log("🚫 Attempting to cancel booking:", bookingId);
+    //("🚫 Attempting to cancel booking:", bookingId);
 
     const result = await Swal.fire({
       title: "Cancel Booking?",
@@ -68,7 +68,7 @@ export default function MyBookings() {
       const token = localStorage.getItem("token");
 
       try {
-        console.log("📤 Sending cancellation request...");
+        //("📤 Sending cancellation request...");
         await axios.delete(
           `http://localhost:3000/booking/cancel/${bookingId}`,
           {
@@ -78,7 +78,7 @@ export default function MyBookings() {
           }
         );
 
-        console.log("✅ Booking cancelled successfully");
+        //("✅ Booking cancelled successfully");
         Swal.fire({
           title: "Cancelled!",
           text: "Your booking has been cancelled.",

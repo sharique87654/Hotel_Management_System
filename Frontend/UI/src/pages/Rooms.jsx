@@ -13,11 +13,11 @@ export default function Booking() {
 
   // Fetch rooms from backend
   useEffect(() => {
-    console.log("🔄 Fetching rooms from backend...");
+    //("🔄 Fetching rooms from backend...");
     axios
       .get("http://localhost:3000/HotelApi/rooms")
       .then((response) => {
-        console.log("✅ Rooms fetched successfully:", response.data);
+        //("✅ Rooms fetched successfully:", response.data);
         setData(response.data);
         setFilteredData(response.data);
       })
@@ -28,7 +28,7 @@ export default function Booking() {
 
   // Search Handler
   const handleSearch = () => {
-    console.log("🔍 Searching for:", search);
+    //("🔍 Searching for:", search);
     const filtered = data.filter((room) => {
       const nameMatch = room.roomName
         .toLowerCase()
@@ -36,13 +36,13 @@ export default function Booking() {
       const priceMatch = room.price.toString().includes(search);
       return nameMatch || priceMatch;
     });
-    console.log("🔍 Search results found:", filtered.length);
+    //("🔍 Search results found:", filtered.length);
     setFilteredData(filtered);
   };
 
   // Reset Handler
   const handleReset = () => {
-    console.log("🔁 Resetting search filters");
+    //("🔁 Resetting search filters");
     setSearch("");
     setFilteredData(data);
   };
