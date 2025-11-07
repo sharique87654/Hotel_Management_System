@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import RoomTable from "../components/AdminComponents/RoomTable";
-import Navbar from "../components/AdminComponents/Navbar";
 import Swal from "sweetalert2";
+import Navbar from "../components/AdminComponents/Navbar";
+import RoomTable from "../components/AdminComponents/RoomTable";
 import Modal from "../components/AdminComponents/Modal";
 
 export default function RoomsManagement() {
@@ -10,96 +10,98 @@ export default function RoomsManagement() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Fetch rooms from backend
+  // ✅ Fetch all rooms
   useEffect(() => {
     fetchRooms();
   }, []);
 
-  function fetchRooms() {
-    axios
-      .get("http://localhost:3000/HotelApi/rooms")
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((error) => console.error(error));
-  }
-
-  // Delete room
-  function deleteHandle(roomName) {
-    axios
-      .delete("http://localhost:3000/admin/roomDelete", {
-        data: { roomName },
-      })
-      .then(() => {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Room has been deleted",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        fetchRooms(); // refresh list
-      })
-      .catch(() => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
-        });
-      });
-  }
-
-  // Save edited room (PUT request)
-  async function handleSave(updatedRoom) {
+  const fetchRooms = async () => {
     try {
-      await axios.put(
-        `http://localhost:3000/HotelApi/rooms/${updatedRoom._id}`,
-        updatedRoom
-      );
+      const res = await axios.get("http://localhost:3000/HotelApi/rooms");
+      setData(res.data);
+    } catch (err) {
+      console.error("❌ Error fetching rooms:", err);
+    }
+  };
+
+  // ✅ Delete room
+  const deleteHandle = async (roomName) => {
+    try {
+      await axios.delete("http://localhost:3000/admin/roomDelete", {
+        data: { roomName },
+      });
 
       Swal.fire({
         icon: "success",
-        title: "Room updated successfully",
+        title: "Room deleted successfully!",
         timer: 1500,
         showConfirmButton: false,
       });
 
-      setModalOpen(false);
-      setSelectedRoom(null);
-      fetchRooms(); // refresh list
+      fetchRooms();
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Update Failed",
-        text: "Something went wrong while updating the room!",
+        title: "Delete Failed",
+        text: "Something went wrong while deleting the room!",
       });
       console.error(error);
     }
-  }
+  };
+
+  // ✅ Handle save from modal
+  const handleSave = async (newRoom) => {
+    fetchRooms(); // refresh list
+    setModalOpen(false);
+    setSelectedRoom(null);
+  };
+
+  const handleEditClick = (room) => {
+    setSelectedRoom({ ...room });
+    setModalOpen(true);
+  };
+
+  const handleAddClick = () => {
+    setSelectedRoom(null);
+    setModalOpen(true);
+  };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      {data.map((element) => (
-        <RoomTable
-          key={element._id}
-          roomName={element.roomName}
-          description={element.description}
-          roomType={element.roomType}
-          numberofbed={element.numberofbed}
-          price={element.price}
-          onEdit={() => {
-            setSelectedRoom(element);
-            setModalOpen(true);
-          }}
-          clickDelete={() => deleteHandle(element.roomName)}
-        />
-      ))}
+
+      <div className="flex justify-end p-4">
+        <button
+          onClick={handleAddClick}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
+        >
+          + Add New Room
+        </button>
+      </div>
+
+      <div className="mt-4 space-y-4">
+        {data.map((room) => (
+          <RoomTable
+            key={room._id}
+            roomName={room.roomName}
+            description={room.description}
+            image={room.imageUrl}
+            roomType={room.roomType}
+            numberofbed={room.numberofbed}
+            price={room.price}
+            onEdit={() => handleEditClick(room)}
+            clickDelete={() => deleteHandle(room.roomName)}
+          />
+        ))}
+      </div>
 
       {modalOpen && (
         <Modal
           roomData={selectedRoom}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedRoom(null);
+          }}
           onSave={handleSave}
         />
       )}

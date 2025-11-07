@@ -1,13 +1,19 @@
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-export default function BookingSection({roomName, noOfBed, description, price}) {
+export default function BookingSection({
+  roomName,
+  noOfBed,
+  description,
+  price,
+  image,
+}) {
   const location = useLocation();
   // const { roomName, noOfBed, description, price } = location.state; // we can do "const room = location.state.roomName "
   const navigate = useNavigate();
   const pathname = location.pathname;
-  console.log(pathname,"PATHHHHHH");
-  
+  console.log(pathname, "PATHHHHHH");
+
   if (pathname) {
     localStorage.setItem("path", pathname);
   }
@@ -31,9 +37,12 @@ export default function BookingSection({roomName, noOfBed, description, price}) 
 
         <div>
           <img
-            src="https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Hotel Image"
             className="rounded-lg w-full h-80 object-cover"
+            src={
+              image ||
+              "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            }
+            alt=""
           />
 
           <h2 className="text-4xl font-bold mt-4">{roomName}</h2>
