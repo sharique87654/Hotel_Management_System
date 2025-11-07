@@ -28,6 +28,8 @@ const RoomsData = new mongoose.Schema({
 });
 
 // ==================== BOOKING MODEL ====================
+
+
 const BookingSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -39,12 +41,19 @@ const BookingSchema = new mongoose.Schema({
     ref: "Rooms",
     required: true,
   },
+  userName: { type: String },     
+  userEmail: { type: String },     
   checkInDate: { type: Date, required: true },
   checkOutDate: { type: Date, required: true },
   guests: { type: Number, required: true },
   totalPrice: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
+
+
+
+
+
 
 const signupdb = mongoose.model("users", Userschema);
 const admindb = mongoose.model("Admin", AdminSchema);

@@ -1,31 +1,32 @@
-const jwt = require('jsonwebtoken');
-const dotenv = require("dotenv")
-dotenv.config()
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
-const authMiddleware = (req , res , next)=>{
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')){
-        return res.status(411).json({
-            message : "Token missing or invalid format"
-        })
-    }
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(411).json({
+      message: "Token missing or invalid format",
+    });
+  }
 
-    const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1];
 
-    console.log(" Received Token:", token);
-    console.log(" Secret Key from .env:", process.env.JwtCode);
+  console.log(" Received Token:", token);
+  console.log(" Secret Key from .env:", process.env.JwtCode);
 
-    try {
-        const decoded = jwt.verify(token, process.env.JwtCode);
-        console.log(" Decoded Payload:", decoded);
-        req.dataId = decoded.userId;
-        next();
-    } catch (error) {
-        console.error(" JWT verification failed:", error.message);
-        return res.status(403).json({
-            msg : "Invalid Signature"
-        })
-    }
-}
+  try {
+    console.log("hi from middleware");
+    const decoded = jwt.verify(token, process.env.JwtCode);
+    console.log(" Decoded Payload:", decoded);
+    req.dataId = decoded.userId;
+    next();
+  } catch (error) {
+    console.error(" JWT verification failed:", error.message);
+    return res.status(403).json({
+      msg: "Invalid Signature",
+    });
+  }
+};
 
 module.exports = authMiddleware;

@@ -46,7 +46,6 @@ export default function Modal({ roomData, onClose, onSave }) {
           imageUrl: formData.imageUrl || "",
         };
 
-        console.log("📤 Sending JSON to backend:", jsonData);
 
         res = await axios.post(
           "http://localhost:3000/admin/add-room",
@@ -75,7 +74,6 @@ export default function Modal({ roomData, onClose, onSave }) {
         });
       }
 
-      console.log("✅ Room added successfully:", res.data);
 
       Swal.fire({
         icon: "success",

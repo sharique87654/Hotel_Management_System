@@ -51,7 +51,6 @@ export default function Hotelrooms() {
           showConfirmButton: false,
           timer: 1500,
         });
-        console.log(handleHotelrooms, "dataaaa");
 
         // Optional: clear form after success
         setroomName("");

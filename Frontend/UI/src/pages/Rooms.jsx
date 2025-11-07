@@ -1,56 +1,54 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import axios from "axios";
 import Loading from "../components/Loading";
-import { useLocation } from "react-router-dom";
 
-// Lazy-loaded components
 const Cards = lazy(() => import("../components/cards"));
 const Navbar = lazy(() => import("../components/Navbar"));
 const Footer = lazy(() => import("../components/Footer"));
 
-
 export default function Booking() {
-  const [data, setData] = useState([]); // All rooms
-  const [filteredData, setFilteredData] = useState([]); // Filtered rooms
-  const [search, setSearch] = useState(""); // Search input
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [search, setSearch] = useState("");
 
-//   const Location = useLocation();
-// console.log(Location, "PathName");
-
-  // 🧠 Fetch rooms from backend
+  // Fetch rooms from backend
   useEffect(() => {
+    console.log("🔄 Fetching rooms from backend...");
     axios
-      .get("http://localhost:3000/HotelApi/rooms")  
+      .get("http://localhost:3000/HotelApi/rooms")
       .then((response) => {
-        console.log("Fetched Data:", response.data);
+        console.log("✅ Rooms fetched successfully:", response.data);
         setData(response.data);
         setFilteredData(response.data);
       })
       .catch((error) => {
-        console.error("Error fetching rooms:", error);
+        console.error("❌ Error fetching rooms:", error);
       });
   }, []);
 
-  // 🔍 Search Handler
+  // Search Handler
   const handleSearch = () => {
+    console.log("🔍 Searching for:", search);
     const filtered = data.filter((room) => {
       const nameMatch = room.roomName
         .toLowerCase()
         .includes(search.toLowerCase());
-      const priceMatch = room.price.includes(search);
+      const priceMatch = room.price.toString().includes(search);
       return nameMatch || priceMatch;
     });
+    console.log("🔍 Search results found:", filtered.length);
     setFilteredData(filtered);
   };
 
-  // 🔁 Reset Handler
+  // Reset Handler
   const handleReset = () => {
+    console.log("🔁 Resetting search filters");
     setSearch("");
     setFilteredData(data);
   };
 
   return (
-    <div className="bg-slate-100 min-h-screen">
+    <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen">
       {/* Navbar */}
       <Suspense
         fallback={
@@ -64,43 +62,45 @@ export default function Booking() {
 
       {/* Main Section */}
       <Suspense fallback={<Loading />}>
-        <div className="text-center mt-[7rem] px-4">
-          <h1 className="text-4xl font-bold mb-4">
+        <div className="text-center mt-[7rem] px-4 pb-16">
+          <h1 className="text-5xl font-bold mb-6 text-white">
             Your Getaway Begins with a Click -{" "}
-            <span className="text-amber-600">Book Now</span>
+            <span className="text-blue-400">Book Now</span>
           </h1>
 
           {/* Search Section */}
-          <div className="flex justify-center items-center gap-3 mb-8">
+          <div className="flex justify-center items-center gap-3 mb-10">
             <input
               type="text"
               placeholder="Search by Room Name or Price..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border border-gray-400 px-4 py-2 rounded-lg w-80 focus:ring-2 focus:ring-blue-400 outline-none"
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              className="border-2 border-blue-500 bg-slate-800/50 text-white px-6 py-3 rounded-lg w-96 focus:ring-2 focus:ring-blue-400 outline-none placeholder-slate-400 backdrop-blur-sm"
             />
             <button
               onClick={handleSearch}
-              className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-lg hover:shadow-blue-500/50"
             >
               Search
             </button>
             <button
               onClick={handleReset}
-              className="bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-400 transition"
+              className="bg-slate-700 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-all font-semibold"
             >
               Reset
             </button>
           </div>
 
-          <hr className="border-none h-[2px] w-auto bg-gray-800 mb-8" />
+          <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent mb-10"></div>
 
           {/* Room Cards Grid */}
-          <div className="grid grid-flow-row grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 px-4 max-w-7xl mx-auto">
             {filteredData.length > 0 ? (
               filteredData.map((element) => (
                 <Cards
                   key={element._id}
+                  roomId={element._id}
                   roomName={element.roomName}
                   description={element.description}
                   image={element.imageUrl}
@@ -110,17 +110,21 @@ export default function Booking() {
                 />
               ))
             ) : (
-              <p className="text-center col-span-full text-gray-600 text-lg">
-                No rooms found.
-              </p>
+              <div className="col-span-full text-center py-20">
+                <p className="text-slate-400 text-2xl mb-4">No rooms found</p>
+                <button
+                  onClick={handleReset}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all"
+                >
+                  View All Rooms
+                </button>
+              </div>
             )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-16">
-          <Footer />
-        </div>
+        <Footer />
       </Suspense>
     </div>
   );
