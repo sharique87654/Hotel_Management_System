@@ -46,7 +46,6 @@ export default function Modal({ roomData, onClose, onSave }) {
           imageUrl: formData.imageUrl || "",
         };
 
-        console.log("📤 Sending JSON to backend:", jsonData);
 
         res = await axios.post(
           "http://localhost:3000/admin/add-room",
@@ -65,7 +64,7 @@ export default function Modal({ roomData, onClose, onSave }) {
         data.append("roomType", formData.roomType);
         data.append("numberofbed", formData.numberofbed);
 
-        console.log("📤 Sending multipart data to backend:", {
+        //("📤 Sending multipart data to backend:", {
           ...formData,
           roomImage: selectedFile.name,
         });
@@ -75,7 +74,6 @@ export default function Modal({ roomData, onClose, onSave }) {
         });
       }
 
-      console.log("✅ Room added successfully:", res.data);
 
       Swal.fire({
         icon: "success",

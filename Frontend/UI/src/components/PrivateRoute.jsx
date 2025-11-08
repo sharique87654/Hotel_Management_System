@@ -3,7 +3,6 @@ import { Navigate, useLocation } from "react-router-dom";
 const PrivateRoute = ({ children }) => {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
   const location = useLocation();
-  console.log(isLoggedIn, "login success");
 
   // If not logged in → redirect to login with redirect info
   return isLoggedIn ? (

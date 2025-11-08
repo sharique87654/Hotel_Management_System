@@ -1,44 +1,81 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-export default function Cards({ image, roomName, description, roomType, price , noOfBed }) {
-    const navigate = useNavigate();
+export default function Cards({
+  roomId,
+  image,
+  roomName,
+  description,
+  roomType,
+  price,
+  noOfBed,
+}) {
+  const navigate = useNavigate();
 
-    const handleMoreDetailClick = () => {
-        navigate('/rooms/roomsBooking', { state: { roomName, description, roomType, price , noOfBed } });
-    };
+  const handleMoreDetailClick = () => {
+    //("🏨 Viewing room details:", { roomId, roomName });
+    navigate("/rooms/roomsBooking", {
+      state: { roomId, roomName, description, roomType, price, noOfBed, image },
+    });
+  };
 
-    return (
-        <div>
-            <div className="grid ml-16 mt-28">
-                <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-xl dark:bg-gray-800 dark:border-gray-700 w-72 min-h-[450px] flex flex-col  ">
-                    <img
-                        className="rounded-t-lg h-48 object-cover"
-                        src={image || "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
-                        alt=""
-                    />
-                    <div className="p-5 flex-grow">
-                        <div className="flex ">
-                            <p className="text-amber-500">{roomType}</p>
-                            <p className="mb-3 font-semibold line-clamp-2 ml-[7.25rem] text-green-500 text-2xl">
-                                {price}
-                            </p>
-                        </div>
-                        <h5 className="mb-2 text-2xl font-bold tracking-tight dark:text-yellow-100">
-                            {roomName}
-                        </h5>
-                        <p className="mb-3 font-normal dark:text-gray-300 line-clamp-2">
-                            {description}
-                        </p>
-                    </div>
-                    <div className="p-5">
-                        <button
-                            onClick={handleMoreDetailClick}
-                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800">
-                            More Detail
-                        </button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-blue-500/30 rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 hover:border-blue-400 transition-all duration-300 group">
+      {/* Room Image */}
+      <div className="relative overflow-hidden">
+        <img
+          className="h-64 w-full object-cover group-hover:scale-110 transition-transform duration-500"
+          src={
+            image ||
+            "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop"
+          }
+          alt={roomName}
+        />
+        <div className="absolute top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+          ₹{price}
         </div>
-    );
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">
+            {roomType}
+          </span>
+          <span className="text-slate-400 text-sm">🛏 {noOfBed} Beds</span>
+        </div>
+
+        <h5 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+          {roomName}
+        </h5>
+
+        <p className="text-slate-400 text-sm line-clamp-2 mb-6 leading-relaxed">
+          {description}
+        </p>
+
+        {/* Button */}
+        <button
+          onClick={handleMoreDetailClick}
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-lg transition-all shadow-lg hover:shadow-blue-500/50 flex items-center justify-center gap-2"
+        >
+          View Details
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 7l5 5m0 0l-5 5m5-5H6"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* Glow Effect */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+    </div>
+  );
 }
