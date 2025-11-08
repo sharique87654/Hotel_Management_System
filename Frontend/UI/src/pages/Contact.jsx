@@ -1,4 +1,5 @@
 import logo from "../assets/main_logo.png";
+import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Swal from "sweetalert2";
 
@@ -149,6 +150,7 @@ export default function Contact() {
           </button>
         </form>
       </div>
+      <Footer />
     </div>
   );
 }
