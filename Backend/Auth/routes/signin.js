@@ -37,7 +37,7 @@ router.post('/signin', async function(req, res) {
             email: foundUser.email
         };
 
-        const token = jwt.sign(payload, process.env.JwtCode, { expiresIn: "1h" });
+        const token = jwt.sign(payload, process.env.JwtCode, { expiresIn: "7d" });
 
         return res.status(200).json({
             message: "You have successfully logged in",
