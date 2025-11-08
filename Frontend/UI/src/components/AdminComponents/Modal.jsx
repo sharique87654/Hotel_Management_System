@@ -3,77 +3,76 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 export default function Modal({ roomData, onClose, onSave }) {
-  const [formData, setFormData] = useState(roomData || {});
+  const [formData, setFormData] = useState(
+    roomData || {
+      roomName: "",
+      description: "",
+      price: "",
+      roomType: "",
+      numberofbed: "",
+      imageUrl: "",
+    }
+  );
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadPreview, setUploadPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    if (roomData) setFormData(roomData);
+    if (roomData) {
+      setFormData(roomData);
+      setUploadPreview(null);
+      setSelectedFile(null);
+    }
   }, [roomData]);
 
-  // ✅ Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Handle image file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid file type",
+          text: "Please select an image file",
+        });
+        return;
+      }
       setSelectedFile(file);
-      setUploadPreview(URL.createObjectURL(file)); // for preview
+      setUploadPreview(URL.createObjectURL(file));
     }
   };
 
-  // ✅ Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUploading(true);
 
     try {
       let res;
+      const data = new FormData();
 
-      // If no new image, send JSON payload
-      if (!selectedFile) {
-        const jsonData = {
-          roomName: formData.roomName,
-          description: formData.description,
-          price: formData.price,
-          roomType: formData.roomType,
-          numberofbed: formData.numberofbed,
-          imageUrl: formData.imageUrl || "",
-        };
+      // Always use FormData for consistency
+      data.append("roomName", formData.roomName);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("roomType", formData.roomType);
+      data.append("numberofbed", formData.numberofbed);
 
-
-        res = await axios.post(
-          "http://localhost:3000/admin/add-room",
-          jsonData,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      } else {
-        // Otherwise, use multipart/form-data for file upload
-        const data = new FormData();
+      if (selectedFile) {
         data.append("roomImage", selectedFile);
-        data.append("roomName", formData.roomName);
-        data.append("description", formData.description);
-        data.append("price", formData.price);
-        data.append("roomType", formData.roomType);
-        data.append("numberofbed", formData.numberofbed);
-
-        //("📤 Sending multipart data to backend:", {
-          ...formData,
-          roomImage: selectedFile.name,
-        });
-
-        res = await axios.post("http://localhost:3000/admin/add-room", data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+      } else if (formData.imageUrl) {
+        data.append("imageUrl", formData.imageUrl);
       }
 
+      res = await axios.post("http://localhost:3000/admin/add-room", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       Swal.fire({
         icon: "success",
@@ -82,133 +81,149 @@ export default function Modal({ roomData, onClose, onSave }) {
         showConfirmButton: false,
       });
 
-      onSave(res.data.room); // refresh parent
-      onClose(); // close modal
+      if (onSave) onSave(res.data.room);
+      onClose();
+
+      // Cleanup
+      if (uploadPreview) {
+        URL.revokeObjectURL(uploadPreview);
+      }
     } catch (error) {
       console.error("❌ Error adding room:", error);
       Swal.fire({
         icon: "error",
         title: "Add Room Failed",
-        text: error.response?.data?.msg || "Something went wrong!",
+        text:
+          error.response?.data?.msg || error.message || "Something went wrong!",
       });
     } finally {
       setUploading(false);
     }
   };
 
-  if (!formData) return null;
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (uploadPreview) {
+        URL.revokeObjectURL(uploadPreview);
+      }
+    };
+  }, [uploadPreview]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4 text-center">Add / Edit Room</h2>
+      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          {roomData?.id ? "Edit Room" : "Add Room"}
+        </h2>
 
         <form onSubmit={handleSubmit}>
-          {/* Room Name */}
           <label className="block mb-2 font-medium">Room Name</label>
           <input
             name="roomName"
             value={formData.roomName || ""}
             onChange={handleChange}
-            className="w-full border p-2 mb-3 rounded-lg"
+            className="w-full border p-2 mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Enter room name"
             required
           />
 
-          {/* Description */}
           <label className="block mb-2 font-medium">Description</label>
           <textarea
             name="description"
             value={formData.description || ""}
             onChange={handleChange}
-            className="w-full border p-2 mb-3 rounded-lg"
+            className="w-full border p-2 mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Enter description"
+            rows="3"
             required
           />
 
-          {/* Room Type */}
           <label className="block mb-2 font-medium">Room Type</label>
           <input
             name="roomType"
             value={formData.roomType || ""}
             onChange={handleChange}
-            className="w-full border p-2 mb-3 rounded-lg"
+            className="w-full border p-2 mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="e.g. Deluxe, Standard"
             required
           />
 
-          {/* Price */}
-          <label className="block mb-2 font-medium">Price</label>
+          <label className="block mb-2 font-medium">Price (₹)</label>
           <input
             name="price"
             type="number"
+            min="0"
+            step="0.01"
             value={formData.price || ""}
             onChange={handleChange}
-            className="w-full border p-2 mb-3 rounded-lg"
+            className="w-full border p-2 mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Enter price"
             required
           />
 
-          {/* Beds */}
           <label className="block mb-2 font-medium">Number of Beds</label>
           <input
             name="numberofbed"
             type="number"
+            min="1"
+            max="10"
             value={formData.numberofbed || ""}
             onChange={handleChange}
-            className="w-full border p-2 mb-3 rounded-lg"
+            className="w-full border p-2 mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="e.g. 1 or 2"
             required
           />
 
-          {/* Image Upload */}
           <label className="block mb-2 font-medium">Room Image</label>
-          <div className="flex items-center gap-3 mb-3">
+          <div className="mb-3">
             {uploadPreview ? (
               <img
                 src={uploadPreview}
                 alt="Preview"
-                className="w-20 h-20 object-cover rounded-lg border"
+                className="w-full h-40 object-cover rounded-lg border mb-2"
               />
             ) : formData.imageUrl ? (
               <img
                 src={formData.imageUrl}
                 alt="Current Room"
-                className="w-20 h-20 object-cover rounded-lg border"
+                className="w-full h-40 object-cover rounded-lg border mb-2"
               />
             ) : (
-              <span className="text-gray-500 text-sm">No image selected</span>
+              <div className="w-full h-40 bg-gray-100 rounded-lg border mb-2 flex items-center justify-center">
+                <span className="text-gray-400">No image selected</span>
+              </div>
             )}
 
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="text-sm"
+              className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
             />
           </div>
 
           {uploading && (
-            <p className="text-blue-500 text-sm mb-2">
-              Uploading, please wait...
+            <p className="text-blue-500 text-sm mb-2 text-center">
+              ⏳ Uploading, please wait...
             </p>
           )}
 
-          {/* Buttons */}
-          <div className="flex justify-between mt-4">
+          <div className="flex gap-3 mt-4">
             <button
               type="button"
               onClick={onClose}
-              className="w-1/2 py-2 bg-gray-400 text-white rounded-lg mr-2"
+              className="flex-1 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition"
+              disabled={uploading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="w-1/2 py-2 bg-green-600 text-white rounded-lg"
+              className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition disabled:bg-gray-300"
               disabled={uploading}
             >
-              {uploading ? "Uploading..." : "Save"}
+              {uploading ? "Uploading..." : "Save Room"}
             </button>
           </div>
         </form>

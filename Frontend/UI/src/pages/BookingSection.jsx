@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function BookingSection() {
   const location = useLocation();
@@ -24,13 +25,14 @@ export default function BookingSection() {
     e.preventDefault();
 
     ("🎫 Booking process started");
-    ("📝 Booking details:", {
-      roomId,
-      roomName,
-      checkInDate,
-      checkOutDate,
-      guests: parseInt(adults) + parseInt(children),
-    });
+    "📝 Booking details:",
+      {
+        roomId,
+        roomName,
+        checkInDate,
+        checkOutDate,
+        guests: parseInt(adults) + parseInt(children),
+      };
 
     // Check if user is logged in
     if (!isLoggedIn || !token) {
@@ -305,7 +307,7 @@ export default function BookingSection() {
                       Processing...
                     </>
                   ) : (
-                    "Book Now"
+                    "Book Now ₹{price}/night"
                   )}
                 </button>
               </form>
@@ -317,6 +319,7 @@ export default function BookingSection() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

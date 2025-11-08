@@ -17,21 +17,21 @@ export default function AdminDashboard() {
     },
     { title: "Basic Rooms", value: basicCount, color: "bg-green-500" },
     { title: "Luxury Rooms", value: luxuryCount, color: "bg-yellow-500" },
-    { title: "Registered Users", value: 120, color: "bg-purple-500" },
+    { title: "Registered Users", value: totalCount, color: "bg-purple-500" },
   ];
 
   return (
     <div>
       <Suspense
-              fallback={
-                <div className="flex justify-center items-center h-20">
-                  <Loading />
-                </div>
-              }
-            >
-              <Navbar />
-            </Suspense>
-      
+        fallback={
+          <div className="flex justify-center items-center h-20">
+            <Loading />
+          </div>
+        }
+      >
+        <Navbar />
+      </Suspense>
+
       <h2 className="text-2xl font-semibold mb-6 text-gray-800">Overview</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, idx) => (

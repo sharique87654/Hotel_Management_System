@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
+import Footer from "../components/Footer";
 
 export default function HotelBooked() {
   return (
@@ -34,6 +35,7 @@ export default function HotelBooked() {
       >
         Your hotel booking has been successfully confirmed.
       </motion.p>
+      <Footer />
     </div>
   );
 }

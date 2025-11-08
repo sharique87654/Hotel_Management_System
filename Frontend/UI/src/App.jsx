@@ -6,6 +6,7 @@ import AdminDashboard from "./adminPages/AdminDashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import MyBookings from "./pages/MyBookings";
 import HotelBooked from "./pages/HotelBooked";
+import AdminBookedHistory from "./adminPages/AdminBookedHistory";
 const RoomsManagement = lazy(() => import("./adminPages/RoomsManagement"));
 const BookingSection = lazy(() => import("./pages/BookingSection"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -60,6 +61,10 @@ function App() {
             <Route
               path="/home/admin/adminpage/adminDashboard"
               element={<AdminDashboard />}
+            />
+            <Route
+              path="/home/admin/adminpage/booked"
+              element={<AdminBookedHistory />}
             />
           </Routes>
         </Suspense>

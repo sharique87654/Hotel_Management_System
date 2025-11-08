@@ -27,7 +27,7 @@ export default function Navbar() {
 
             <li>
               <a
-                href="#"
+                href="/home/admin/adminpage/booked"
                 className="text-sm font-semibold text-gray-300 hover:text-white transition duration-300 ease-in-out"
               >
                 Booked

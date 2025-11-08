@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Calendar, Users, Trash2 } from "lucide-react";
+import Loading from "../components/Loading";
+import Footer from "../components/Footer";
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
@@ -24,7 +26,6 @@ export default function MyBookings() {
   }, []);
 
   const fetchBookings = async () => {
-    //("🔄 Fetching user bookings...");
     const token = localStorage.getItem("token");
 
     try {
@@ -36,7 +37,6 @@ export default function MyBookings() {
           },
         }
       );
-      //("✅ Bookings fetched:", response.data);
       setBookings(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -50,8 +50,6 @@ export default function MyBookings() {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    //("🚫 Attempting to cancel booking:", bookingId);
-
     const result = await Swal.fire({
       title: "Cancel Booking?",
       text: "Are you sure you want to cancel this booking?",
@@ -68,7 +66,6 @@ export default function MyBookings() {
       const token = localStorage.getItem("token");
 
       try {
-        //("📤 Sending cancellation request...");
         await axios.delete(
           `http://localhost:3000/booking/cancel/${bookingId}`,
           {
@@ -78,7 +75,6 @@ export default function MyBookings() {
           }
         );
 
-        //("✅ Booking cancelled successfully");
         Swal.fire({
           title: "Cancelled!",
           text: "Your booking has been cancelled.",
@@ -113,8 +109,17 @@ export default function MyBookings() {
 
   return (
     <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen">
-      <Navbar />
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center h-20">
+            <Loading />
+          </div>
+        }
+      >
+        <Navbar />
+      </Suspense>
 
+      <Suspense fallback={<Loading />}></Suspense>
       <div className="container mx-auto px-4 py-8 mt-20">
         <div className="mb-12">
           <h1 className="text-5xl font-bold text-white mb-3">
@@ -166,77 +171,131 @@ export default function MyBookings() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-6">
             {bookings.map((booking) => (
               <div
                 key={booking._id}
                 className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-blue-500/30 rounded-2xl overflow-hidden shadow-xl hover:shadow-blue-500/20 transition-all group"
               >
-                <div className="relative">
-                  <img
-                    src={
-                      booking.roomId?.imageUrl ||
-                      "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop"
-                    }
-                    alt={booking.roomId?.roomName}
-                    className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
-                    ₹{booking.totalPrice}
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">
-                    {booking.roomId?.roomName || "Room"}
-                  </h3>
-                  <p className="text-blue-400 text-sm mb-4">
-                    {booking.roomId?.roomType || "Standard Room"}
-                  </p>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center gap-3 text-slate-300">
-                      <Calendar size={18} className="text-blue-400" />
-                      <div className="text-sm">
-                        <span className="text-slate-400">Check-in:</span>{" "}
-                        <span className="font-semibold">
-                          {new Date(booking.checkInDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-slate-300">
-                      <Calendar size={18} className="text-blue-400" />
-                      <div className="text-sm">
-                        <span className="text-slate-400">Check-out:</span>{" "}
-                        <span className="font-semibold">
-                          {new Date(booking.checkOutDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-slate-300">
-                      <Users size={18} className="text-blue-400" />
-                      <div className="text-sm">
-                        <span className="text-slate-400">Guests:</span>{" "}
-                        <span className="font-semibold">{booking.guests}</span>
-                      </div>
+                <div className="flex flex-col md:flex-row">
+                  {/* Image Section - Left Side */}
+                  <div className="relative md:w-1/3 lg:w-1/4">
+                    <img
+                      src={
+                        booking.roomId?.imageUrl ||
+                        "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop"
+                      }
+                      alt={booking.roomId?.roomName}
+                      className="w-full h-full min-h-[250px] object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+                      ₹{booking.totalPrice}
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleCancelBooking(booking._id)}
-                    className="w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-red-500/30"
-                  >
-                    <Trash2 size={18} />
-                    Cancel Booking
-                  </button>
+                  {/* Details Section - Right Side */}
+                  <div className="flex-1 p-6 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-3xl font-bold text-white mb-2">
+                        {booking.roomId?.roomName || "Room"}
+                      </h3>
+                      <p className="text-blue-400 text-base mb-6">
+                        {booking.roomId?.roomType || "Standard Room"}
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div className="flex items-center gap-3 text-slate-300">
+                          <div className="bg-blue-500/20 p-2 rounded-lg">
+                            <Calendar size={20} className="text-blue-400" />
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-xs">Check-in</p>
+                            <p className="font-semibold text-white">
+                              {new Date(booking.checkInDate).toLocaleDateString(
+                                "en-IN",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 text-slate-300">
+                          <div className="bg-blue-500/20 p-2 rounded-lg">
+                            <Calendar size={20} className="text-blue-400" />
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-xs">Check-out</p>
+                            <p className="font-semibold text-white">
+                              {new Date(
+                                booking.checkOutDate
+                              ).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 text-slate-300">
+                          <div className="bg-blue-500/20 p-2 rounded-lg">
+                            <Users size={20} className="text-blue-400" />
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-xs">Guests</p>
+                            <p className="font-semibold text-white">
+                              {booking.guests}{" "}
+                              {booking.guests === 1 ? "Guest" : "Guests"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 text-slate-300">
+                          <div className="bg-green-500/20 p-2 rounded-lg">
+                            <svg
+                              className="w-5 h-5 text-green-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-xs">Status</p>
+                            <p className="font-semibold text-green-400">
+                              Confirmed
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleCancelBooking(booking._id)}
+                      className="w-full md:w-auto bg-red-600 hover:bg-red-500 text-white font-semibold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-red-500/30"
+                    >
+                      <Trash2 size={18} />
+                      Cancel Booking
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+      <Footer />
+      <Suspense />
     </div>
   );
 }
