@@ -26,6 +26,10 @@ function authMiddleware(req, res, next) {
   }
 }
 
+
+
+// for booking the rooms
+
 router.post("/book/:roomId", authMiddleware, async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -67,6 +71,11 @@ router.post("/book/:roomId", authMiddleware, async (req, res) => {
   }
 });
 
+
+
+// view all booked room by the user....
+
+
 router.get("/mybookings", authMiddleware, async (req, res) => {
   try {
     const bookings = await bookingdb
@@ -89,5 +98,38 @@ router.get("/mybookings", authMiddleware, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+
+
+
+// cancel the booked room by the user..
+
+router.delete("/cancel/:bookingId", authMiddleware, async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+
+    const booking = await bookingdb.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ msg: "Booking not found" });
+    }
+
+  
+    if (booking.userId.toString() !== req.userId) {
+      return res.status(403).json({ msg: "Unauthorized to cancel this booking" });
+    }
+
+    
+    await bookingdb.findByIdAndDelete(bookingId);
+
+    res.status(200).json({
+      success: true,
+      msg: "Booking cancelled successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 
 module.exports = router;
