@@ -31,6 +31,7 @@ function authMiddleware(req, res, next) {
 // for booking the rooms
 
 router.post("/book/:roomId", authMiddleware, async (req, res) => {
+  console.log("roomId : ",roomId);
   try {
     const { roomId } = req.params;
     const { checkInDate, checkOutDate, guests, totalPrice } = req.body;
