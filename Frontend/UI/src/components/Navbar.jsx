@@ -2,15 +2,19 @@ import { useState, useEffect, useRef } from "react";
 import logo from "../assets/main_logo.png";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { ShoppingCart } from "lucide-react";
+import axios from "axios";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const isLoggedIn = localStorage.getItem("isLoggedIn");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -23,13 +27,9 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // lowercase
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        //(decoded, "decoded data");
-
-        // Use decoded.name or fallback to decoded.email or "User"
         setName(decoded.name || "User");
         setEmail(decoded.email || "noEmail");
       } catch (error) {
@@ -38,116 +38,184 @@ const Navbar = () => {
     }
   }, []);
 
+  // Fetch cart count from backend
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      fetchCartCount();
+    }
+  }, [isLoggedIn, token]);
+
+  const fetchCartCount = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/booking/mybookings", {
+        headers: { Authorization: token },
+      });
+      setCartCount(res.data.data.length);
+    } catch (error) {
+      console.error("Error fetching cart count:", error);
+      setCartCount(0);
+    }
+  };
+
+  // Refresh cart count when navigating back
+  useEffect(() => {
+    const handleFocus = () => {
+      if (isLoggedIn && token) {
+        fetchCartCount();
+      }
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [isLoggedIn, token]);
+
   const signout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("path");
+    setCartCount(0);
     navigate("/signin");
   };
 
   const AuthButtons = () => {
     if (isLoggedIn) {
       return (
-        <div className="relative" ref={dropdownRef}>
-          {/* User Button */}
+        <div className="flex items-center gap-4">
+          {/* Cart Icon with Badge */}
           <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-3 px-4 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
+            onClick={() => navigate("/cart")}
+            className="relative p-2 hover:bg-gray-800 rounded-full transition-all duration-200 group"
           >
-            {/* Dynamic Initials */}
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-              {name
-                ? name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                : "U"}
-            </div>
-            {/* Display Name */}
-            <span className="text-gray-700 font-medium">{name}</span>
-            {/* Arrow */}
-            <svg
-              className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
-                dropdownOpen ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            <ShoppingCart
+              size={28}
+              className="text-white group-hover:text-blue-400 transition-colors"
+            />
+            {/* Cart Badge */}
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
+                {cartCount}
+              </span>
+            )}
           </button>
 
-          {/* Dropdown Menu */}
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-              {/* User Info */}
-              <div className="px-4 py-3 border-b border-gray-100">
-                <p className="text-sm font-semibold text-gray-800">{email}</p>
+          {/* User Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-3 px-4 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
+            >
+              {/* Dynamic Initials */}
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                {name
+                  ? name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()
+                  : "U"}
               </div>
-
-              {/* Menu Items */}
-              <button
-                onClick={() => {
-                  navigate("/mybookings");
-                  setDropdownOpen(false);
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition duration-150"
+              {/* Display Name */}
+              <span className="text-gray-700 font-medium">{name}</span>
+              {/* Arrow */}
+              <svg
+                className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
+                  dropdownOpen ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="w-5 h-5 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                My Bookings
-              </button>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
 
-              {/* Divider */}
-              <div className="border-t border-gray-100 my-1"></div>
+            {/* Dropdown Menu */}
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                {/* User Info */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-semibold text-gray-800">{email}</p>
+                </div>
 
-              {/* Sign Out */}
-              <button
-                onClick={() => {
-                  signout();
-                  setDropdownOpen(false);
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition duration-150 font-medium"
-              >
-                <svg
-                  className="w-5 h-5 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                {/* Cart Menu Item */}
+                <button
+                  onClick={() => {
+                    navigate("/cart");
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between transition duration-150"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-                Sign Out
-              </button>
-            </div>
-          )}
+                  <div className="flex items-center gap-3">
+                    <ShoppingCart className="w-5 h-5 text-gray-600" />
+                    Cart
+                  </div>
+                  {cartCount > 0 && (
+                    <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* My Bookings */}
+                <button
+                  onClick={() => {
+                    navigate("/mybookings");
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition duration-150"
+                >
+                  <svg
+                    className="w-5 h-5 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                  My Bookings
+                </button>
+
+                {/* Divider */}
+                <div className="border-t border-gray-100 my-1"></div>
+
+                {/* Sign Out */}
+                <button
+                  onClick={() => {
+                    signout();
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition duration-150 font-medium"
+                >
+                  <svg
+                    className="w-5 h-5 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       );
     } else {
-      // When not logged in
       return (
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition"
@@ -159,9 +227,8 @@ const Navbar = () => {
     }
   };
 
-  // ✅ Main Navbar Layout
   return (
-    <header className="flex items-center justify-between w-full bg-black bg-opacity-85 dark:bg-dark px-8 py-4 shadow-md">
+    <header className="flex items-center justify-between w-full bg-black bg-opacity-85 dark:bg-dark px-8 py-4 shadow-md fixed top-0 z-50">
       {/* Left: Logo */}
       <div className="flex items-center">
         <img
@@ -202,18 +269,38 @@ const Navbar = () => {
           <ListItem NavLink="/">Home</ListItem>
           <ListItem NavLink="/rooms">Rooms</ListItem>
           <ListItem NavLink="/contact">Contact</ListItem>
-          <button
-            className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-full font-medium transition"
-            onClick={() => navigate("/signin")}
-          >
-            Sign In
-          </button>
-          <button
-            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition"
-            onClick={signout}
-          >
-            Sign Out
-          </button>
+
+          {/* Mobile Cart Button */}
+          {isLoggedIn && (
+            <button
+              onClick={() => navigate("/cart")}
+              className="relative flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-medium transition"
+            >
+              <ShoppingCart size={20} />
+              Cart
+              {cartCount > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {!isLoggedIn ? (
+            <button
+              className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-full font-medium transition"
+              onClick={() => navigate("/signin")}
+            >
+              Sign In
+            </button>
+          ) : (
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition"
+              onClick={signout}
+            >
+              Sign Out
+            </button>
+          )}
         </div>
       )}
     </header>
@@ -222,7 +309,6 @@ const Navbar = () => {
 
 export default Navbar;
 
-// ✅ Reusable ListItem Component
 const ListItem = ({ children, NavLink }) => {
   return (
     <li>

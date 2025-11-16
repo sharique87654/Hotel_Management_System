@@ -7,6 +7,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import MyBookings from "./pages/MyBookings";
 import HotelBooked from "./pages/HotelBooked";
 import AdminBookedHistory from "./adminPages/AdminBookedHistory";
+import Cart from "./pages/Cart";
 const RoomsManagement = lazy(() => import("./adminPages/RoomsManagement"));
 const BookingSection = lazy(() => import("./pages/BookingSection"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -14,7 +15,7 @@ const Signin = lazy(() => import("./pages/Signin"));
 const Home = lazy(() => import("./pages/Home"));
 const Booking = lazy(() => import("./pages/Rooms"));
 const AdminAuth = lazy(() => import("./pages/AdminAuth"));
-const AdminPage = lazy(() => import("./pages/AdminPage"));
+// const AdminPage = lazy(() => import("./pages/AdminPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Hotelrooms = lazy(() => import("./adminPages/Hotelrooms"));
 
@@ -44,12 +45,13 @@ function App() {
             <Route path="/rooms/booked" element={<HotelBooked />} />
             <Route path="/mybookings" element={<MyBookings />} />
             <Route path="/signin" element={<Signin />} />
+            <Route path="/cart" element={<Cart />} />
 
             <Route path="/contact" element={<Contact />} />
             <Route path="/rooms/roomsBooking" element={<BookingSection />} />
             <Route path="/home/admin" element={<AdminAuth />} />
             {/* components for admin user */}
-            <Route path="/home/admin/adminpage" element={<AdminPage />} />
+            {/* <Route path="/home/admin/adminpage" element={<AdminPage />} /> */}
             <Route
               path="/home/admin/adminpage/hotelrooms"
               element={<Hotelrooms />}

@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Navbar from "../components/Navbar";
@@ -14,308 +14,255 @@ export default function BookingSection() {
 
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
-  const [adults, setAdults] = useState("");
+  const [adults, setAdults] = useState("1");
   const [children, setChildren] = useState("0");
   const [loading, setLoading] = useState(false);
+  const [nights, setNights] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(price || 0);
 
   const isLoggedIn = localStorage.getItem("isLoggedIn");
   const token = localStorage.getItem("token");
 
-  const handleBooking = async (e) => {
-    e.preventDefault();
+  // Calculate nights + price
+  useEffect(() => {
+    if (checkInDate && checkOutDate) {
+      const inD = new Date(checkInDate);
+      const outD = new Date(checkOutDate);
+      const diff = outD - inD;
+      const n = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
-    ("🎫 Booking process started");
-    "📝 Booking details:",
-      {
-        roomId,
-        roomName,
-        checkInDate,
-        checkOutDate,
-        guests: parseInt(adults) + parseInt(children),
-      };
+      if (n > 0) {
+        setNights(n);
+        setTotalPrice(price * n);
+      }
+    }
+  }, [checkInDate, checkOutDate, price]);
 
-    // Check if user is logged in
+  // Validation
+  const validateBooking = () => {
     if (!isLoggedIn || !token) {
-      console.warn("⚠️ User not logged in. Redirecting to sign in...");
       Swal.fire({
         icon: "warning",
         title: "Login Required",
-        text: "Please login to book a room",
-        confirmButtonColor: "#2563eb",
+        text: "Please login first",
       });
-      localStorage.setItem("redirectAfterLogin", location.pathname);
-      localStorage.setItem("bookingState", JSON.stringify(location.state));
       navigate("/signin");
-      return;
+      return false;
     }
 
-    // Validate dates
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
-
-    if (checkIn >= checkOut) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Dates",
-        text: "Check-out date must be after check-in date!",
-      });
-      console.error("❌ Invalid date range");
-      return;
+    if (!checkInDate || !checkOutDate) {
+      Swal.fire({ icon: "error", title: "Select dates" });
+      return false;
     }
+
+    const inD = new Date(checkInDate);
+    const outD = new Date(checkOutDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (inD < today) {
+      Swal.fire({ icon: "error", title: "Invalid check-in date" });
+      return false;
+    }
+
+    if (outD <= inD) {
+      Swal.fire({ icon: "error", title: "Checkout must be after check-in" });
+      return false;
+    }
+
+    return true;
+  };
+
+  // Add to Cart handler - Creates booking in backend
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    if (!validateBooking()) return;
 
     setLoading(true);
 
     try {
-      //("📤 Sending booking request to backend...");
+      const guests = parseInt(adults) + parseInt(children);
 
-      const totalGuests = parseInt(adults) + parseInt(children);
-
+      // 1️⃣ Create booking in backend
       const response = await axios.post(
         `http://localhost:3000/booking/book/${roomId}`,
         {
-          checkInDate: checkInDate,
-          checkOutDate: checkOutDate,
-          guests: totalGuests,
-          totalPrice: price,
+          checkInDate,
+          checkOutDate,
+          guests,
+          totalPrice,
         },
         {
-          headers: {
-            Authorization: token,
-          },
+          headers: { Authorization: token },
         }
       );
 
-      //("✅ Booking successful:", response.data);
+      console.log("✅ Booking created:", response.data);
 
-      if (response.status === 200) {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Room Booked Successfully!",
-          text: "Your booking has been confirmed",
-          showConfirmButton: false,
-          timer: 2000,
-        });
+      Swal.fire({
+        icon: "success",
+        title: "Added to cart!",
+        text: "Check your cart to proceed",
+        timer: 1500,
+        showConfirmButton: false,
+      });
 
-        setTimeout(() => {
-          navigate("/rooms/booked", {
-            state: { bookingData: response.data.bookingDetails },
-          });
-        }, 2000);
-      }
+      navigate("/cart");
     } catch (error) {
-      console.error("❌ Booking error:", error);
+      console.error("❌ Error:", error);
       Swal.fire({
         icon: "error",
         title: "Booking Failed",
-        text:
-          error.response?.data?.msg || "Something went wrong while booking!",
+        text: error.response?.data?.message || "Something went wrong",
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
     <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen">
       <Navbar />
-
       <div className="container mx-auto px-4 py-8 mt-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Side: Room Details */}
-          <div className="space-y-6">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                className="w-full h-96 object-cover"
-                src={
-                  image ||
-                  "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop"
-                }
-                alt={roomName}
-              />
-              <div className="absolute top-6 right-6 bg-blue-600 text-white px-6 py-3 rounded-full font-bold text-xl shadow-lg">
-                ₹{price}/night
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Room Image */}
+          <div>
+            <img
+              src={
+                image ||
+                "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop"
+              }
+              className="w-full h-96 object-cover rounded-xl shadow-2xl"
+              alt={roomName}
+            />
+            <div className="mt-6 bg-slate-800 p-6 rounded-xl border border-blue-500/30">
+              <h2 className="text-2xl font-bold text-white mb-4">{roomName}</h2>
+              <p className="text-slate-300 mb-4">{description}</p>
+              <div className="flex justify-between text-white">
+                <span>🏷️ {roomType}</span>
+                <span>🛏️ {noOfBed} Beds</span>
               </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-blue-500/30 rounded-2xl p-8">
-              <h2 className="text-4xl font-bold text-white mb-2">{roomName}</h2>
-              <p className="text-blue-400 text-lg mb-6">{roomType}</p>
-
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="bg-slate-700/50 p-4 rounded-lg text-center border border-blue-500/20">
-                  <div className="text-3xl mb-2">🛏️</div>
-                  <p className="text-white font-semibold">{noOfBed} Beds</p>
-                </div>
-                <div className="bg-slate-700/50 p-4 rounded-lg text-center border border-blue-500/20">
-                  <div className="text-3xl mb-2">👑</div>
-                  <p className="text-white font-semibold">King Size</p>
-                </div>
-                <div className="bg-slate-700/50 p-4 rounded-lg text-center border border-blue-500/20">
-                  <div className="text-3xl mb-2">📺</div>
-                  <p className="text-white font-semibold">Smart TV</p>
-                </div>
-              </div>
-
-              <h3 className="text-2xl font-bold text-blue-400 mb-4">
-                Description
-              </h3>
-              <p className="text-slate-300 leading-relaxed mb-8">
-                {description}
-              </p>
-
-              <h3 className="text-2xl font-bold text-blue-400 mb-4">
-                Room Amenities
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  "📶 Free Wi-Fi",
-                  "🌊 Sea View",
-                  "☕ Coffee Maker",
-                  "🔇 Soundproof",
-                  "🏝️ Balcony",
-                  "🍷 Minibar",
-                  "❄️ Air Conditioning",
-                  "🚿 Premium Bathroom",
-                ].map((amenity, index) => (
-                  <div
-                    key={index}
-                    className="bg-slate-700/50 p-3 rounded-lg text-white text-sm font-medium border border-blue-500/20"
-                  >
-                    {amenity}
-                  </div>
-                ))}
+              <div className="mt-4 text-3xl text-green-400 font-bold">
+                ₹{price} / night
               </div>
             </div>
           </div>
 
-          {/* Right Side: Booking Form */}
-          <div className="lg:sticky lg:top-24 h-fit">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-blue-500/50 rounded-2xl p-8 shadow-2xl">
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="line-through text-slate-500 text-xl font-semibold">
-                    ₹{parseInt(price) + 3000}
-                  </span>
-                  <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                    SAVE ₹3000
-                  </span>
+          {/* Booking Form */}
+          <div className="bg-slate-800 p-8 rounded-xl border border-blue-500/30">
+            <h2 className="text-3xl text-white font-bold mb-6">
+              Book Your Stay
+            </h2>
+
+            <form onSubmit={handleAddToCart} className="space-y-6">
+              {/* Check-in Date */}
+              <div>
+                <label className="text-white block mb-2 font-semibold">
+                  📅 Check-in Date
+                </label>
+                <input
+                  type="date"
+                  value={checkInDate}
+                  onChange={(e) => setCheckInDate(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  className="w-full px-4 py-3 bg-slate-700 text-white rounded-lg border border-blue-500/30 focus:ring-2 focus:ring-blue-400 outline-none"
+                  required
+                />
+              </div>
+
+              {/* Check-out Date */}
+              <div>
+                <label className="text-white block mb-2 font-semibold">
+                  📅 Check-out Date
+                </label>
+                <input
+                  type="date"
+                  value={checkOutDate}
+                  onChange={(e) => setCheckOutDate(e.target.value)}
+                  min={checkInDate || new Date().toISOString().split("T")[0]}
+                  className="w-full px-4 py-3 bg-slate-700 text-white rounded-lg border border-blue-500/30 focus:ring-2 focus:ring-blue-400 outline-none"
+                  required
+                />
+              </div>
+
+              {/* Guests */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-white block mb-2 font-semibold">
+                    👨 Adults
+                  </label>
+                  <input
+                    type="number"
+                    value={adults}
+                    onChange={(e) => setAdults(e.target.value)}
+                    min="1"
+                    className="w-full px-4 py-3 bg-slate-700 text-white rounded-lg border border-blue-500/30 focus:ring-2 focus:ring-blue-400 outline-none"
+                  />
                 </div>
-                <div className="text-4xl font-bold text-blue-400">
-                  ₹{price}
-                  <span className="text-lg text-slate-400 font-normal">
-                    /night
-                  </span>
+                <div>
+                  <label className="text-white block mb-2 font-semibold">
+                    👶 Children
+                  </label>
+                  <input
+                    type="number"
+                    value={children}
+                    onChange={(e) => setChildren(e.target.value)}
+                    min="0"
+                    className="w-full px-4 py-3 bg-slate-700 text-white rounded-lg border border-blue-500/30 focus:ring-2 focus:ring-blue-400 outline-none"
+                  />
                 </div>
               </div>
 
-              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
-                <p className="text-slate-300 text-sm leading-relaxed">
-                  ✓ Check-in: 12:00 PM
-                  <br />
-                  ✓ Check-out: 11:59 AM
-                  <br />✓ Free cancellation up to 24hrs before check-in
-                </p>
-              </div>
-
-              {/* Booking Form */}
-              <form onSubmit={handleBooking} className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white font-semibold mb-2 text-sm">
-                      Check-In Date
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full p-3 border-2 border-blue-500/30 bg-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                      value={checkInDate}
-                      onChange={(e) => setCheckInDate(e.target.value)}
-                      min={new Date().toISOString().split("T")[0]}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white font-semibold mb-2 text-sm">
-                      Check-Out Date
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full p-3 border-2 border-blue-500/30 bg-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                      value={checkOutDate}
-                      onChange={(e) => setCheckOutDate(e.target.value)}
-                      min={
-                        checkInDate || new Date().toISOString().split("T")[0]
-                      }
-                      required
-                    />
+              {/* Summary */}
+              {nights > 0 && (
+                <div className="bg-slate-700 p-5 rounded-lg border border-blue-400/30">
+                  <h3 className="text-white font-bold mb-3 text-lg">
+                    Booking Summary
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-slate-300">
+                      <span>🌙 Nights:</span>
+                      <span className="text-white font-semibold">{nights}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-300">
+                      <span>💰 Price per night:</span>
+                      <span className="text-white font-semibold">₹{price}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-300">
+                      <span>👥 Guests:</span>
+                      <span className="text-white font-semibold">
+                        {parseInt(adults) + parseInt(children)}
+                      </span>
+                    </div>
+                    <div className="border-t border-slate-600 pt-2 mt-2">
+                      <div className="flex justify-between">
+                        <span className="text-green-400 font-bold text-xl">
+                          Total Amount:
+                        </span>
+                        <span className="text-green-400 font-bold text-xl">
+                          ₹{totalPrice}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white font-semibold mb-2 text-sm">
-                      Adults
-                    </label>
-                    <input
-                      type="number"
-                      className="w-full p-3 border-2 border-blue-500/30 bg-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                      value={adults}
-                      onChange={(e) => setAdults(e.target.value)}
-                      required
-                      min="1"
-                      max="10"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white font-semibold mb-2 text-sm">
-                      Children
-                    </label>
-                    <input
-                      type="number"
-                      className="w-full p-3 border-2 border-blue-500/30 bg-slate-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                      value={children}
-                      onChange={(e) => setChildren(e.target.value)}
-                      min="0"
-                      max="5"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xl py-4 rounded-lg transition-all shadow-xl hover:shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                          fill="none"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      Processing...
-                    </>
-                  ) : (
-                    "Book Now ₹{price}/night"
-                  )}
-                </button>
-              </form>
-
-              <p className="text-slate-400 text-xs text-center mt-4">
-                🔒 Secure payment • Best price guarantee
-              </p>
-            </div>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-bold text-lg hover:from-blue-500 hover:to-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/50 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="animate-spin">⏳</span> Adding...
+                  </>
+                ) : (
+                  <>🛒 Add to Cart</>
+                )}
+              </button>
+            </form>
           </div>
         </div>
       </div>
