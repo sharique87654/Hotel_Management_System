@@ -16,10 +16,9 @@ const hotelInput = zod.object({
 // Partial schema (for updating)
 const hotelUpdateInput = hotelInput.partial();
 
-router.patch('/roomupdate/:roomid', async function(req, res) {
+router.patch('/roomupdate/:roomId', async function(req, res) {
     const data = req.body;
 
-    // validate only the fields that are present
     const parsed = hotelUpdateInput.safeParse(data);
 
     if (!parsed.success) {
@@ -30,7 +29,7 @@ router.patch('/roomupdate/:roomid', async function(req, res) {
 
     try {
         const result = await roomdata.updateOne(
-            { _id: req.params.roomid },
+            { _id: req.params.roomId },   // ✅ FIXED PARAM NAME
             { $set: data }
         );
 
@@ -51,5 +50,6 @@ router.patch('/roomupdate/:roomid', async function(req, res) {
         });
     }
 });
+
 
 module.exports = router;

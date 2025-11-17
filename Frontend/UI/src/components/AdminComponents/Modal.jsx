@@ -72,7 +72,7 @@ export default function Modal({ roomData, onClose, onSave }) {
         data.append("roomImage", selectedFile);
 
         res = await axios.patch(
-          `http://localhost:3000/admin/roomupdate/${id}`,
+          `http://localhost:3000/admin/roomupdate/${roomId}`,
           data,
           {
             headers: {
@@ -96,7 +96,7 @@ export default function Modal({ roomData, onClose, onSave }) {
         }
 
         res = await axios.patch(
-          `http://localhost:3000/admin/roomupdate/${id}`,
+          `http://localhost:3000/admin/roomupdate/${roomId}`,
           jsonData,
           {
             headers: {
