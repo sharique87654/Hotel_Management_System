@@ -33,7 +33,6 @@ export default function Modal({ roomData, onClose, onSave }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith("image/")) {
         Swal.fire({
           icon: "error",
@@ -53,55 +52,89 @@ export default function Modal({ roomData, onClose, onSave }) {
 
     try {
       let res;
-      const data = new FormData();
 
-      // Always use FormData for consistency
-      data.append("roomName", formData.roomName);
-      data.append("description", formData.description);
-      data.append("price", formData.price);
-      data.append("roomType", formData.roomType);
-      data.append("numberofbed", formData.numberofbed);
+      // ✅ FIX: Use backticks and get id from roomData
+      const roomId = roomData?._id || roomData?.id;
 
-      if (selectedFile) {
-        data.append("roomImage", selectedFile);
-      } else if (formData.imageUrl) {
-        data.append("imageUrl", formData.imageUrl);
+      if (!roomId) {
+        throw new Error("Room ID is missing");
       }
 
-      res = await axios.post("http://localhost:3000/admin/add-room", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // Prepare data based on whether there's a file upload
+      if (selectedFile) {
+        // If uploading new image, use FormData
+        const data = new FormData();
+        data.append("roomName", formData.roomName);
+        data.append("description", formData.description);
+        data.append("price", formData.price);
+        data.append("roomType", formData.roomType);
+        data.append("numberofbed", formData.numberofbed);
+        data.append("roomImage", selectedFile);
+
+        res = await axios.put(
+          `http://localhost:3000/admin/roomupdate/${roomId}`,
+          data,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      } else {
+        // If no new image, send JSON data
+        const jsonData = {
+          roomName: formData.roomName,
+          description: formData.description,
+          price: formData.price,
+          roomType: formData.roomType,
+          numberofbed: formData.numberofbed,
+        };
+
+        // Include existing imageUrl if present
+        if (formData.imageUrl) {
+          jsonData.imageUrl = formData.imageUrl;
+        }
+
+        res = await axios.patch(
+          `http://localhost:3000/admin/roomupdate/${id}`,
+          jsonData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
 
       Swal.fire({
         icon: "success",
-        title: "Room added successfully!",
+        title: "Room updated successfully!",
         timer: 1500,
         showConfirmButton: false,
       });
 
-      if (onSave) onSave(res.data.room);
+      if (onSave) onSave(res.data);
       onClose();
 
-      // Cleanup
       if (uploadPreview) {
         URL.revokeObjectURL(uploadPreview);
       }
     } catch (error) {
-      console.error("❌ Error adding room:", error);
+      console.error("❌ Error updating room:", error);
       Swal.fire({
         icon: "error",
-        title: "Add Room Failed",
+        title: "Update Failed",
         text:
-          error.response?.data?.msg || error.message || "Something went wrong!",
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong!",
       });
     } finally {
       setUploading(false);
     }
   };
 
-  // Cleanup preview URL on unmount
   useEffect(() => {
     return () => {
       if (uploadPreview) {
@@ -114,7 +147,7 @@ export default function Modal({ roomData, onClose, onSave }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">
-          {roomData?.id ? "Edit Room" : "Add Room"}
+          {roomData?._id || roomData?.id ? "Edit Room" : "Add Room"}
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -223,7 +256,7 @@ export default function Modal({ roomData, onClose, onSave }) {
               className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition disabled:bg-gray-300"
               disabled={uploading}
             >
-              {uploading ? "Uploading..." : "Save Room"}
+              {uploading ? "Updating..." : "Save Room"}
             </button>
           </div>
         </form>
