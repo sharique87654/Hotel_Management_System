@@ -51,20 +51,25 @@ export default function Modal({ roomData, onClose, onSave }) {
     setUploading(true);
 
     try {
+      let res;
+
+      // ✅ FIX: Use backticks and get id from roomData
       const roomId = roomData?._id || roomData?.id;
 
       if (!roomId) {
         throw new Error("Room ID is missing");
       }
 
-      // ✅ ALWAYS send as JSON with proper number conversion
-      const jsonData = {
-        roomName: formData.roomName,
-        description: formData.description,
-        price: Number(formData.price), // ✅ Convert to number
-        roomType: formData.roomType,
-        numberofbed: Number(formData.numberofbed), // ✅ Convert to number
-      };
+      // Prepare data based on whether there's a file upload
+      if (selectedFile) {
+        // If uploading new image, use FormData
+        const data = new FormData();
+        data.append("roomName", formData.roomName);
+        data.append("description", formData.description);
+        data.append("price", formData.price);
+        data.append("roomType", formData.roomType);
+        data.append("numberofbed", formData.numberofbed);
+        data.append("roomImage", selectedFile);
 
         res = await axios.patch(
           `http://localhost:3000/admin/roomupdate/${roomId}`,
@@ -100,16 +105,6 @@ export default function Modal({ roomData, onClose, onSave }) {
           }
         );
       }
-
-      const res = await axios.patch(
-        `http://localhost:3000/admin/roomupdate/${roomId}`,
-        jsonData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
 
       Swal.fire({
         icon: "success",
@@ -239,14 +234,11 @@ export default function Modal({ roomData, onClose, onSave }) {
               onChange={handleFileChange}
               className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              ⚠️ Image preview only - upload not enabled
-            </p>
           </div>
 
           {uploading && (
             <p className="text-blue-500 text-sm mb-2 text-center">
-              ⏳ Updating room...
+              ⏳ Uploading, please wait...
             </p>
           )}
 
