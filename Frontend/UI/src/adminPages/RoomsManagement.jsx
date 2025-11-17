@@ -67,32 +67,52 @@ export default function RoomsManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <Navbar />
 
-      <div className="flex justify-end p-4">
-        <button
-          onClick={handleAddClick}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
-        >
-          + Add New Room
-        </button>
-      </div>
+      <div className="container mx-auto px-4 py-6">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Room Management</h1>
+            <p className="text-gray-400 mt-1">
+              Manage all hotel rooms and their details
+            </p>
+          </div>
+          <button
+            onClick={handleAddClick}
+            className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg 
+            shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all duration-200 
+            font-semibold flex items-center gap-2"
+          >
+            <span className="text-xl">+</span> Add New Room
+          </button>
+        </div>
 
-      <div className="mt-4 space-y-4">
-        {data.map((room) => (
-          <RoomTable
-            key={room._id}
-            roomName={room.roomName}
-            description={room.description}
-            image={room.imageUrl}
-            roomType={room.roomType}
-            numberofbed={room.numberofbed}
-            price={room.price}
-            onEdit={() => handleEditClick(room)}
-            clickDelete={() => deleteHandle(room.roomName)}
-          />
-        ))}
+        {/* Rooms List */}
+        <div className="space-y-4">
+          {data.length > 0 ? (
+            data.map((room) => (
+              <RoomTable
+                key={room._id}
+                roomName={room.roomName}
+                description={room.description}
+                image={room.imageUrl}
+                roomType={room.roomType}
+                numberofbed={room.numberofbed}
+                price={room.price}
+                onEdit={() => handleEditClick(room)}
+                clickDelete={() => deleteHandle(room.roomName)}
+              />
+            ))
+          ) : (
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-12 text-center">
+              <p className="text-gray-400 text-lg">
+                No rooms available. Add your first room!
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {modalOpen && (

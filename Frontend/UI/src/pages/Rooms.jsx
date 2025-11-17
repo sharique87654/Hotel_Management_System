@@ -13,11 +13,9 @@ export default function Booking() {
 
   // Fetch rooms from backend
   useEffect(() => {
-    //("🔄 Fetching rooms from backend...");
     axios
       .get("http://localhost:3000/HotelApi/rooms")
       .then((response) => {
-        //("✅ Rooms fetched successfully:", response.data);
         setData(response.data);
         setFilteredData(response.data);
       })
@@ -28,7 +26,6 @@ export default function Booking() {
 
   // Search Handler
   const handleSearch = () => {
-    //("🔍 Searching for:", search);
     const filtered = data.filter((room) => {
       const nameMatch = room.roomName
         .toLowerCase()
@@ -36,19 +33,17 @@ export default function Booking() {
       const priceMatch = room.price.toString().includes(search);
       return nameMatch || priceMatch;
     });
-    //("🔍 Search results found:", filtered.length);
     setFilteredData(filtered);
   };
 
   // Reset Handler
   const handleReset = () => {
-    //("🔁 Resetting search filters");
     setSearch("");
     setFilteredData(data);
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen">
+    <div className="bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 min-h-screen">
       {/* Navbar */}
       <Suspense
         fallback={
@@ -63,39 +58,61 @@ export default function Booking() {
       {/* Main Section */}
       <Suspense fallback={<Loading />}>
         <div className="text-center mt-[7rem] px-4 pb-16">
-          <h1 className="text-5xl font-bold mb-6 text-white">
-            Your Getaway Begins with a Click -{" "}
-            <span className="text-blue-400">Book Now</span>
-          </h1>
+          {/* Hero Title */}
+          <div className="mb-10">
+            <h1 className="text-5xl font-bold mb-3 text-white leading-tight">
+              Your Perfect Stay Awaits
+            </h1>
+            <p className="text-xl text-gray-400">
+              Book your dream room with just a{" "}
+              <span className="text-blue-400 font-semibold">click</span>
+            </p>
+          </div>
 
           {/* Search Section */}
-          <div className="flex justify-center items-center gap-3 mb-10">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 max-w-3xl mx-auto">
             <input
               type="text"
-              placeholder="Search by Room Name or Price..."
+              placeholder="Search by room name or price..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              className="border-2 border-blue-500 bg-slate-800/50 text-white px-6 py-3 rounded-lg w-96 focus:ring-2 focus:ring-blue-400 outline-none placeholder-slate-400 backdrop-blur-sm"
+              className="border-2 border-gray-700 bg-gray-800/70 text-white px-6 py-3.5 rounded-xl 
+              w-full sm:flex-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none 
+              placeholder-gray-500 backdrop-blur-sm transition-all duration-200"
             />
             <button
               onClick={handleSearch}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-lg hover:shadow-blue-500/50"
+              className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-3.5 rounded-xl 
+              hover:from-blue-500 hover:to-blue-600 transition-all font-semibold shadow-lg 
+              hover:shadow-blue-500/50 w-full sm:w-auto"
             >
-              Search
+              🔍 Search
             </button>
             <button
               onClick={handleReset}
-              className="bg-slate-700 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-all font-semibold"
+              className="bg-gray-700 text-white px-8 py-3.5 rounded-xl hover:bg-gray-600 
+              transition-all font-semibold w-full sm:w-auto"
             >
-              Reset
+              ↻ Reset
             </button>
           </div>
 
-          <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent mb-10"></div>
+          <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent mb-12"></div>
+
+          {/* Results Counter */}
+          {filteredData.length > 0 && (
+            <p className="text-gray-400 mb-6">
+              Showing{" "}
+              <span className="text-white font-semibold">
+                {filteredData.length}
+              </span>{" "}
+              {filteredData.length === 1 ? "room" : "rooms"}
+            </p>
+          )}
 
           {/* Room Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 px-4 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 max-w-[1400px] mx-auto">
             {filteredData.length > 0 ? (
               filteredData.map((element) => (
                 <Cards
@@ -111,10 +128,16 @@ export default function Booking() {
               ))
             ) : (
               <div className="col-span-full text-center py-20">
-                <p className="text-slate-400 text-2xl mb-4">No rooms found</p>
+                <span className="text-6xl mb-4 block">🔍</span>
+                <p className="text-gray-400 text-2xl mb-2">No rooms found</p>
+                <p className="text-gray-500 mb-6">
+                  Try adjusting your search criteria
+                </p>
                 <button
                   onClick={handleReset}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-3 
+                  rounded-xl hover:from-blue-500 hover:to-blue-600 transition-all font-semibold 
+                  shadow-lg hover:shadow-blue-500/50"
                 >
                   View All Rooms
                 </button>

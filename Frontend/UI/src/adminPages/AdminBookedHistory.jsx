@@ -69,7 +69,6 @@ const AdminBookedHistory = () => {
 
     if (result.isConfirmed) {
       try {
-        // ✅ Changed from PATCH to DELETE to match backend
         const response = await axios.delete(
           `http://localhost:3000/admin/cancelBooking/${bookingId}`
         );
@@ -83,7 +82,6 @@ const AdminBookedHistory = () => {
             showConfirmButton: false,
           });
 
-          // Refresh bookings list
           fetchBookings();
         }
       } catch (error) {
@@ -99,103 +97,135 @@ const AdminBookedHistory = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading bookings...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-gray-300 font-medium">Loading bookings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <Navbar />
 
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="p-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Booking History
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Booking Management
             </h1>
-            <p className="text-gray-600">
-              Manage and view all customer bookings
+            <p className="text-gray-400">
+              Monitor and manage all customer reservations
             </p>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <p className="text-gray-500 text-sm">Total Bookings</p>
-              <p className="text-2xl font-bold text-gray-800">
-                {bookings.length}
-              </p>
+            <div
+              className="bg-gradient-to-br from-purple-600 to-purple-700 p-6 rounded-xl shadow-lg 
+            border border-purple-500/30 hover:shadow-purple-500/30 hover:shadow-xl transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-200 text-sm font-medium">
+                    Total Bookings
+                  </p>
+                  <p className="text-4xl font-bold text-white mt-1">
+                    {bookings.length}
+                  </p>
+                </div>
+                <div className="bg-white/20 p-4 rounded-lg">
+                  <span className="text-3xl">📊</span>
+                </div>
+              </div>
             </div>
-            <div className="bg-red-50 p-4 rounded-lg shadow">
-              <p className="text-red-600 text-sm">Cancelled Bookings</p>
-              <p className="text-2xl font-bold text-red-800">
-                {
-                  bookings.filter(
-                    (b) => b.status?.toLowerCase() === "cancelled"
-                  ).length
-                }
-              </p>
+            <div
+              className="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-xl shadow-lg 
+            border border-red-500/30 hover:shadow-red-500/30 hover:shadow-xl transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-red-200 text-sm font-medium">
+                    Cancelled Bookings
+                  </p>
+                  <p className="text-4xl font-bold text-white mt-1">
+                    {
+                      bookings.filter(
+                        (b) => b.status?.toLowerCase() === "cancelled"
+                      ).length
+                    }
+                  </p>
+                </div>
+                <div className="bg-white/20 p-4 rounded-lg">
+                  <span className="text-3xl">❌</span>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
-              {error}
+            <div
+              className="bg-red-900/30 border border-red-500 text-red-300 p-4 rounded-xl mb-6 
+            backdrop-blur-sm"
+            >
+              <span className="font-semibold">Error:</span> {error}
             </div>
           )}
 
           {/* Bookings Table */}
           {bookings.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-xl p-12 text-center">
               <div className="text-6xl mb-4">📋</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              <h3 className="text-2xl font-semibold text-gray-200 mb-2">
                 No Bookings Found
               </h3>
-              <p className="text-gray-500">No bookings have been made yet</p>
+              <p className="text-gray-400">
+                No reservations have been made yet
+              </p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div
+              className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden 
+            hover:shadow-purple-500/20 transition-all duration-300"
+            >
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-100 border-b">
+                  <thead className="bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
                         Booking ID
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                        Guest Name
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
+                        Guest Details
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                        Room Details
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
+                        Room
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
                         Check-In
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
                         Check-Out
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
                         Nights
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                        Total Amount
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
+                        Amount
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-purple-400/30">
                         Status
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                         Action
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-700">
                     {bookings.map((booking) => {
                       const isCancelled =
                         booking.status?.toLowerCase() === "cancelled";
@@ -203,56 +233,58 @@ const AdminBookedHistory = () => {
                       return (
                         <tr
                           key={booking._id}
-                          className={`hover:bg-gray-50 transition ${
-                            isCancelled ? "opacity-60" : ""
+                          className={`hover:bg-gray-700/50 transition-all duration-200 ${
+                            isCancelled ? "opacity-50" : ""
                           }`}
                         >
-                          <td className="px-4 py-3 text-sm text-gray-800 font-mono">
+                          <td className="px-4 py-4 text-sm text-purple-400 font-mono font-semibold">
                             #{booking._id?.slice(-6).toUpperCase()}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-4">
                             <div>
-                              <p className="text-sm font-medium text-gray-800">
+                              <p className="text-sm font-semibold text-white">
                                 {booking.userId?.firstname}{" "}
                                 {booking.userId?.lastname}
                               </p>
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-400 mt-0.5">
                                 {booking.userId?.email}
                               </p>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-4">
                             <div className="flex items-center gap-3">
                               {booking.roomId?.imageUrl && (
                                 <img
                                   src={booking.roomId.imageUrl}
                                   alt={booking.roomId.roomName}
-                                  className="w-12 h-12 rounded object-cover"
+                                  className="w-14 h-14 rounded-lg object-cover border-2 border-gray-600 
+                                  shadow-md hover:scale-110 transition-transform duration-200"
                                 />
                               )}
                               <div>
-                                <p className="text-sm font-medium text-gray-800">
+                                <p className="text-sm font-semibold text-white">
                                   {booking.roomId?.roomName || "N/A"}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-400">
                                   {booking.roomId?.roomType}
                                 </p>
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
+                          <td className="px-4 py-4 text-sm text-gray-300">
                             {formatDate(booking.checkInDate)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
+                          <td className="px-4 py-4 text-sm text-gray-300">
                             {formatDate(booking.checkOutDate)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
+                          <td className="px-4 py-4 text-sm text-blue-400 font-semibold">
                             {calculateNights(
                               booking.checkInDate,
                               booking.checkOutDate
-                            )}
+                            )}{" "}
+                            nights
                           </td>
-                          <td className="px-4 py-3 text-sm font-semibold text-gray-800">
+                          <td className="px-4 py-4 text-sm font-bold text-green-400">
                             ₹
                             {booking.totalAmount?.toLocaleString("en-IN") ||
                               (
@@ -263,18 +295,24 @@ const AdminBookedHistory = () => {
                                 )
                               ).toLocaleString("en-IN")}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-4">
                             {isCancelled ? (
-                              <span className="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                              <span
+                                className="px-3 py-1.5 text-xs font-semibold rounded-full 
+                              bg-red-900/50 text-red-300 border border-red-500/50"
+                              >
                                 ❌ Cancelled
                               </span>
                             ) : (
-                              <span className="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                              <span
+                                className="px-3 py-1.5 text-xs font-semibold rounded-full 
+                              bg-green-900/50 text-green-300 border border-green-500/50"
+                              >
                                 ✅ Active
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-4">
                             {!isCancelled ? (
                               <button
                                 onClick={() =>
@@ -283,12 +321,14 @@ const AdminBookedHistory = () => {
                                     `${booking.userId?.firstname} ${booking.userId?.lastname}`
                                   )
                                 }
-                                className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded-lg transition"
+                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs 
+                                font-semibold rounded-lg transition-all duration-200 shadow-md 
+                                hover:shadow-red-500/50 hover:scale-105"
                               >
                                 Cancel
                               </button>
                             ) : (
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-gray-500 italic">
                                 Cancelled
                               </span>
                             )}
@@ -304,16 +344,22 @@ const AdminBookedHistory = () => {
 
           {/* Summary Footer */}
           {bookings.length > 0 && (
-            <div className="mt-6 bg-blue-50 rounded-lg p-4 flex justify-between items-center">
-              <p className="text-gray-700">
-                Showing <span className="font-bold">{bookings.length}</span>{" "}
-                total bookings
+            <div
+              className="mt-6 bg-gray-800 border border-gray-700 rounded-xl p-5 flex justify-between 
+            items-center shadow-lg"
+            >
+              <p className="text-gray-300">
+                Showing{" "}
+                <span className="font-bold text-white">{bookings.length}</span>{" "}
+                total booking{bookings.length !== 1 ? "s" : ""}
               </p>
               <button
                 onClick={fetchBookings}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white 
+                rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-200 
+                font-semibold text-sm hover:scale-105 flex items-center gap-2"
               >
-                🔄 Refresh
+                <span>🔄</span> Refresh Data
               </button>
             </div>
           )}
