@@ -71,8 +71,8 @@ export default function Modal({ roomData, onClose, onSave }) {
         data.append("numberofbed", formData.numberofbed);
         data.append("roomImage", selectedFile);
 
-        res = await axios.put(
-          `http://localhost:3000/admin/roomupdate/${roomId}`,
+        res = await axios.patch(
+          `http://localhost:3000/admin/roomupdate/${id}`,
           data,
           {
             headers: {
