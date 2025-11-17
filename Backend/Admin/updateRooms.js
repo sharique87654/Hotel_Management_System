@@ -1,41 +1,55 @@
-const express = require('express')
-const zod = require('zod')
-const { roomdata } = require('../db')
+const express = require('express');
+const zod = require('zod');
+const { roomdata } = require('../db');
 
-const router = express.Router()
+const router = express.Router();
 
+// Full schema (for creating rooms)
 const hotelInput = zod.object({
-    roomName : zod.string().min(1),
-    description : zod.string().min(1),
-    price : zod.string().min(1),
-    roomType : zod.string().min(1),
-    numberofbed : zod.string().min(1)
+    roomName: zod.string().min(1),
+    description: zod.string().min(1),
+    price: zod.number(),
+    roomType: zod.string().min(1),
+    numberofbed: zod.number()
+});
 
-})
-router.put('/roomUpdate/:id' , async function(req , res){
-    const data = req.body
-    const validUpdate = hotelInput.safeParse(data)
+// Partial schema (for updating)
+const hotelUpdateInput = hotelInput.partial();
 
-    if (!validUpdate.success){
+router.patch('/roomupdate/:id', async function(req, res) {
+    const data = req.body;
+
+    // validate only the fields that are present
+    const parsed = hotelUpdateInput.safeParse(data);
+
+    if (!parsed.success) {
         return res.status(411).json({
-            error : "Invalid input"
-        })
+            error: "Invalid input"
+        });
     }
-    
+
     try {
-        await roomdata.updateOne(
-        {_id : req.params.id} , 
-        data
-    )
-} catch (error) {
-    return res.status(500).json({
-        message : "Server error"
-    })
-}
+        const result = await roomdata.updateOne(
+            { _id: req.params.id },
+            { $set: data }
+        );
 
-    return res.status(200).json({
-        message : "Update successful"
-    })
-})
+        if (result.matchedCount === 0) {
+            return res.status(404).json({
+                message: "Room not found"
+            });
+        }
 
-module.exports = router
+        return res.status(200).json({
+            message: "Room updated successfully"
+        });
+        
+    } catch(error) {
+        return res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
+});
+
+module.exports = router;
