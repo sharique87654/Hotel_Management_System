@@ -32,7 +32,6 @@ export default function Hotelrooms() {
       formData.append("roomType", roomType);
       formData.append("numberofbed", numberofbed);
 
-      // ✅ Send request
       const handleHotelrooms = await axios.post(
         "http://localhost:3000/admin/add-room",
         formData,
@@ -52,7 +51,6 @@ export default function Hotelrooms() {
           timer: 1500,
         });
 
-        // Optional: clear form after success
         setroomName("");
         setdescription("");
         setprice("");
@@ -66,12 +64,11 @@ export default function Hotelrooms() {
         title: "Oops...",
         text: "Something went wrong while uploading!",
       });
-      //("Upload error:", error);
     }
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <Navbar />
       <Suspense
         fallback={
@@ -81,95 +78,147 @@ export default function Hotelrooms() {
         }
       ></Suspense>
 
-      <form className="max-w-sm mx-auto" onSubmit={hotelData}>
-        {/* Name */}
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
-          Name
-        </label>
-        <input
-          type="text"
-          value={roomName}
-          onChange={(e) => setroomName(e.target.value)}
-          className="text-sm rounded-lg block w-full p-2.5 dark:bg-gray-200 dark:text-black"
-          required
-        />
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white mb-2">Add New Room</h1>
+            <p className="text-gray-400">
+              Fill in the details to publish a new hotel room
+            </p>
+          </div>
 
-        {/* Description */}
-        <br />
-        <label className="block mb-2 text-sm font-medium dark:text-black">
-          Description
-        </label>
-        <textarea
-          rows="4"
-          value={description}
-          onChange={(e) => setdescription(e.target.value)}
-          className="block p-2.5 w-full text-sm rounded-lg border border-gray-300 dark:bg-gray-200 dark:text-black"
-          placeholder="Describe the room here..."
-          required
-        ></textarea>
+          {/* Form Container */}
+          <form
+            className="bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-700"
+            onSubmit={hotelData}
+          >
+            {/* Name */}
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-semibold text-gray-200">
+                Room Name
+              </label>
+              <input
+                type="text"
+                value={roomName}
+                onChange={(e) => setroomName(e.target.value)}
+                className="text-sm rounded-lg block w-full p-3 bg-gray-700 border border-gray-600 
+                placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+                transition-all duration-200"
+                placeholder="e.g., Deluxe Ocean View"
+                required
+              />
+            </div>
 
-        {/* Price */}
-        <br />
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
-          Price
-        </label>
-        <input
-          type="number"
-          value={price}
-          onChange={(e) => setprice(e.target.value)}
-          className="text-sm rounded-lg block w-full p-2.5 dark:bg-gray-200 dark:text-black"
-          required
-        />
+            {/* Description */}
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-semibold text-gray-200">
+                Description
+              </label>
+              <textarea
+                rows="4"
+                value={description}
+                onChange={(e) => setdescription(e.target.value)}
+                className="block p-3 w-full text-sm rounded-lg border border-gray-600 bg-gray-700 
+                placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+                transition-all duration-200 resize-none"
+                placeholder="Describe the room amenities, view, and features..."
+                required
+              ></textarea>
+            </div>
 
-        {/* Upload Image */}
-        <br />
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
-          Upload Room Images
-        </label>
-        <input
-          className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageUrl(e.target.files[0])}
-        />
+            {/* Price */}
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-semibold text-gray-200">
+                Price per Night
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-gray-400">₹</span>
+                <input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setprice(e.target.value)}
+                  className="text-sm rounded-lg block w-full p-3 pl-8 bg-gray-700 border border-gray-600 
+                  placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+                  transition-all duration-200"
+                  placeholder="5000"
+                  required
+                />
+              </div>
+            </div>
 
-        {/* Room Type */}
-        <br />
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
-          Room Type
-        </label>
-        <input
-          type="text"
-          value={roomType}
-          onChange={(e) => setroomType(e.target.value)}
-          className="text-sm rounded-lg block w-full p-2.5 dark:bg-gray-200 dark:text-black"
-          required
-        />
+            {/* Upload Image */}
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-semibold text-gray-200">
+                Upload Room Image
+              </label>
+              <div className="relative">
+                <input
+                  className="block w-full text-sm text-gray-300 border border-gray-600 rounded-lg 
+                  cursor-pointer bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 
+                  file:mr-4 file:py-2.5 file:px-4 file:border-0 file:text-sm file:font-semibold 
+                  file:bg-purple-600 file:text-white hover:file:bg-purple-700 file:cursor-pointer 
+                  transition-all duration-200"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageUrl(e.target.files[0])}
+                />
+              </div>
+              {imageUrl && (
+                <p className="mt-2 text-xs text-green-400">✓ {imageUrl.name}</p>
+              )}
+            </div>
 
-        {/* Number of Beds */}
-        <br />
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
-          Number of Beds
-        </label>
-        <input
-          type="number"
-          value={numberofbed}
-          onChange={(e) => setnumberofbed(e.target.value)}
-          className="text-sm rounded-lg block w-full p-2.5 dark:bg-gray-200 dark:text-black"
-          required
-        />
+            {/* Room Type and Number of Beds - Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Room Type */}
+              <div>
+                <label className="block mb-2 text-sm font-semibold text-gray-200">
+                  Room Type
+                </label>
+                <input
+                  type="text"
+                  value={roomType}
+                  onChange={(e) => setroomType(e.target.value)}
+                  className="text-sm rounded-lg block w-full p-3 bg-gray-700 border border-gray-600 
+                  placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+                  transition-all duration-200"
+                  placeholder="e.g., Deluxe, Suite"
+                  required
+                />
+              </div>
 
-        {/* Submit Button */}
-        <br />
-        <button
-          type="submit"
-          className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl 
-          focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium 
-          rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        >
-          Publish
-        </button>
-      </form>
+              {/* Number of Beds */}
+              <div>
+                <label className="block mb-2 text-sm font-semibold text-gray-200">
+                  Number of Beds
+                </label>
+                <input
+                  type="number"
+                  value={numberofbed}
+                  onChange={(e) => setnumberofbed(e.target.value)}
+                  className="text-sm rounded-lg block w-full p-3 bg-gray-700 border border-gray-600 
+                  placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+                  transition-all duration-200"
+                  placeholder="2"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full text-white bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500 
+              hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 
+              font-semibold rounded-lg text-sm px-5 py-3.5 text-center shadow-lg hover:shadow-purple-500/50 
+              transform hover:scale-[1.02] transition-all duration-200"
+            >
+              Publish Room
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
