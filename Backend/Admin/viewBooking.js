@@ -5,10 +5,9 @@ const { bookingdb } = require("../db");
 // ✅ Route: Get all bookings (Admin Panel)
 router.get("/allBookings", async (req, res) => {
   try {
-    // Fetch all bookings and populate room & user info
     const bookings = await bookingdb
       .find()
-      .populate("roomId", "roomName roomType price imageUrl")
+      .populate("rooms.roomId", "roomName roomType price imageUrl numberofbed")
       .populate("userId", "firstname lastname email")
       .exec();
 
@@ -26,5 +25,6 @@ router.get("/allBookings", async (req, res) => {
     res.status(500).json({ msg: "Server Error" });
   }
 });
+
 
 module.exports = router;
