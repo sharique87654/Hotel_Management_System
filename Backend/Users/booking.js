@@ -8,7 +8,6 @@ dotenv.config();
 // Middleware to verify token
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization;
-  //("hi", token);
   if (!token)
     return res.status(401).json({
       msg: "Token missing",
@@ -35,41 +34,48 @@ router.post("/book/:roomId", authMiddleware, async (req, res) => {
     const { roomId } = req.params;
     const { checkInDate, checkOutDate, guests, totalPrice } = req.body;
 
-    // Verify room exists
     const room = await roomdata.findById(roomId);
-    if (!room) {
-      return res.status(404).json({ msg: "Room not found" });
-    }
+    if (!room) return res.status(404).json({ msg: "Room not found" });
 
-    // Get user info for name + email
+    // Get user info
     const user = await signupdb.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ msg: "User not found" });
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    // Check if booking doc exists
+    let userBooking = await bookingdb.findOne({ userId: req.userId });
+
+    if (!userBooking) {
+      // Create new booking document with user info
+      userBooking = new bookingdb({
+        userId: req.userId,
+        userName: `${user.firstname} ${user.lastname}`,
+        userEmail: user.email,
+        rooms: []
+      });
     }
 
-    // Create booking with user info
-    const booking = new bookingdb({
-      userId: req.userId,
-      userName: `${user.firstname} ${user.lastname}`,
-      userEmail: user.email,
+    // Push room to array
+    userBooking.rooms.push({
       roomId,
       checkInDate,
       checkOutDate,
       guests,
-      totalPrice,
+      totalPrice
     });
 
-    await booking.save();
+    await userBooking.save();
 
-    return res.status(200).json({
-      msg: "Booking successful",
-      bookingDetails: booking,
+    res.status(200).json({
+      msg: "Room booked successfully",
+      booking: userBooking
     });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ msg: "Server error" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server Error" });
   }
 });
+
 
 
 
@@ -78,58 +84,25 @@ router.post("/book/:roomId", authMiddleware, async (req, res) => {
 
 router.get("/mybookings", authMiddleware, async (req, res) => {
   try {
-    const bookings = await bookingdb
-      .find({ userId: req.userId })
-      .populate("roomId", "roomName roomType price numberofbed imageUrl")
-      .populate("userId", "firstname lastname email")
-      .exec();
+    const booking = await bookingdb
+      .findOne({ userId: req.userId })
+      .populate("rooms.roomId", "roomName roomType price numberofbed imageUrl");
 
-    if (!bookings.length) {
+    if (!booking) {
       return res.status(404).json({ msg: "No bookings found" });
     }
 
     res.status(200).json({
       success: true,
-      count: bookings.length,
-      data: bookings,
+      data: booking,
     });
-  } catch (error) {
-    console.error(error);
+
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
 
-
-
-// cancel the booked room by the user..
-
-router.delete("/cancel/:bookingId", authMiddleware, async (req, res) => {
-  try {
-    const { bookingId } = req.params;
-
-
-    const booking = await bookingdb.findById(bookingId);
-    if (!booking) {
-      return res.status(404).json({ msg: "Booking not found" });
-    }
-
-  
-    if (booking.userId.toString() !== req.userId) {
-      return res.status(403).json({ msg: "Unauthorized to cancel this booking" });
-    }
-
-    
-    await bookingdb.findByIdAndDelete(bookingId);
-
-    res.status(200).json({
-      success: true,
-      msg: "Booking cancelled successfully",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
 
 
 module.exports = router;

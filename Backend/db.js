@@ -35,20 +35,28 @@ const BookingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "users",
     required: true,
+    unique: true
   },
-  roomId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Rooms",
-    required: true,
-  },
-  userName: { type: String },     
-  userEmail: { type: String },     
-  checkInDate: { type: Date, required: true },
-  checkOutDate: { type: Date, required: true },
-  guests: { type: Number, required: true },
-  totalPrice: { type: Number, required: true },
-  createdAt: { type: Date, default: Date.now },
+
+  userName: { type: String, required: true },
+  userEmail: { type: String, required: true },
+
+  rooms: [
+    {
+      roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Rooms",
+        required: true
+      },
+      checkInDate: { type: Date, required: true },
+      checkOutDate: { type: Date, required: true },
+      guests: { type: Number, required: true },
+      totalPrice: { type: Number, required: true },
+      bookedAt: { type: Date, default: Date.now }
+    }
+  ]
 });
+
 
 
 
