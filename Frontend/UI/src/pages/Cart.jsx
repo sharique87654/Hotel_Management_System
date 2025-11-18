@@ -129,7 +129,7 @@ export default function Cart() {
       }
 
       console.error("Full error object:", error);
-    } finally {
+    } finally { 
       setLoading(false);
       console.log("🏁 fetchCartItems completed, loading set to false");
     }

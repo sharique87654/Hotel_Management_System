@@ -68,6 +68,71 @@ const AdminBookedHistory = () => {
     return rooms.reduce((total, room) => total + (room.totalPrice || 0), 0);
   };
 
+  // **NEW: Handle delete specific room from booking**
+  const handleDeleteRoom = async (
+    bookingId,
+    roomId,
+    roomName,
+    bookingRoomsLength
+  ) => {
+    // Check if this is the last room in the booking
+    if (bookingRoomsLength === 1) {
+      Swal.fire({
+        icon: "warning",
+        title: "Cannot Delete",
+        text: "This is the last room in the booking. Please cancel the entire booking instead.",
+        confirmButtonColor: "#6b7280",
+      });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Delete Room?",
+      text: `Are you sure you want to remove "${roomName}" from this booking?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, Delete Room",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.delete(
+          "http://localhost:3000/admin/roomDelete",
+          {
+            data: {
+              bookingId: bookingId,
+              roomId: roomId,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Room Deleted!",
+            text: "The room has been removed from the booking successfully.",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+
+          // Refresh bookings to show updated data
+          fetchBookings();
+        }
+      } catch (error) {
+        console.error("Error deleting room:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text:
+            error.response?.data?.msg || "Failed to delete room from booking",
+        });
+      }
+    }
+  };
+
   // Handle cancel booking
   const handleCancelBooking = async (bookingId, guestName) => {
     const result = await Swal.fire({
@@ -353,7 +418,7 @@ const AdminBookedHistory = () => {
                                         key={index}
                                         className="bg-gray-800/80 border border-gray-700 rounded-lg p-4 hover:border-purple-500/50 transition-all duration-200"
                                       >
-                                        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
+                                        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
                                           {/* Room Image & Name */}
                                           <div className="col-span-2 flex items-center gap-3">
                                             {room.roomId?.imageUrl && (
@@ -444,6 +509,43 @@ const AdminBookedHistory = () => {
                                               Booked:{" "}
                                               {formatDate(room.bookedAt)}
                                             </p>
+                                          </div>
+
+                                          {/* **NEW: Delete Room Button** */}
+                                          <div className="text-right">
+                                            {!isCancelled ? (
+                                              <button
+                                                onClick={() =>
+                                                  handleDeleteRoom(
+                                                    booking._id,
+                                                    room.roomId?._id,
+                                                    room.roomId?.roomName,
+                                                    booking.rooms.length
+                                                  )
+                                                }
+                                                className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-red-500/50 hover:scale-105 flex items-center gap-1"
+                                                title="Delete this room"
+                                              >
+                                                <svg
+                                                  className="w-4 h-4"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  viewBox="0 0 24 24"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                  />
+                                                </svg>
+                                                Remove
+                                              </button>
+                                            ) : (
+                                              <span className="text-xs text-gray-500 italic">
+                                                Cancelled
+                                              </span>
+                                            )}
                                           </div>
                                         </div>
                                       </div>

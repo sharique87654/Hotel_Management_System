@@ -15,7 +15,6 @@ const Signin = lazy(() => import("./pages/Signin"));
 const Home = lazy(() => import("./pages/Home"));
 const Booking = lazy(() => import("./pages/Rooms"));
 const AdminAuth = lazy(() => import("./pages/AdminAuth"));
-// const AdminPage = lazy(() => import("./pages/AdminPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Hotelrooms = lazy(() => import("./adminPages/Hotelrooms"));
 
