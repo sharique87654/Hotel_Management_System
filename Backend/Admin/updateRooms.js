@@ -10,7 +10,9 @@ const hotelInput = zod.object({
     description: zod.string().min(1),
     price: zod.number(),
     roomType: zod.string().min(1),
-    numberofbed: zod.number()
+    numberofbed: zod.number(),
+    imageUrl:zod.string()
+
 });
 
 // Partial schema (for updating)
@@ -29,7 +31,7 @@ router.patch('/roomupdate/:roomId', async function(req, res) {
 
     try {
         const result = await roomdata.updateOne(
-            { _id: req.params.roomId },   // ✅ FIXED PARAM NAME
+            { _id: req.params.roomId },  
             { $set: data }
         );
 
