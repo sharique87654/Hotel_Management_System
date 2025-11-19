@@ -60,6 +60,33 @@ const BookingSchema = new mongoose.Schema({
 
 
 
+// ==================== CART MODEL ====================
+
+const CartSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+    required: true,
+    unique: true
+  },
+
+  rooms: [
+    {
+      roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Rooms",
+        required: true
+      },
+      checkInDate: { type: Date, required: true },
+      checkOutDate: { type: Date, required: true },
+      guests: { type: Number, required: true },
+      totalPrice: { type: Number, required: true },
+      addedAt: { type: Date, default: Date.now }
+    }
+  ]
+});
+
+
 
 
 
@@ -67,10 +94,12 @@ const signupdb = mongoose.model("users", Userschema);
 const admindb = mongoose.model("Admin", AdminSchema);
 const roomdata = mongoose.model("Rooms", RoomsData);
 const bookingdb = mongoose.model('BookedRooms', BookingSchema);
+const cartdb = mongoose.model("cart", CartSchema)
 
 module.exports = {
   signupdb,
   admindb,
   roomdata,
   bookingdb,
+  cartdb
 };
