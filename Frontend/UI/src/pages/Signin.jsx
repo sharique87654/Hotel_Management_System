@@ -24,6 +24,9 @@ export default function Signin() {
       if (response.status === 200) {
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("token", response.data.token);
+
+        console.log(response.data.token, "-- MY TOKEN");
+
         const pathname = localStorage.getItem("path");
 
         if (pathname) {
