@@ -105,4 +105,42 @@ router.get("/mybookings", authMiddleware, async (req, res) => {
 
 
 
+router.delete("/cancel/:roomId", authMiddleware, async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const booking = await bookingdb.findOne({ userId: req.userId });
+
+    if (!booking) {
+      return res.status(404).json({
+        msg: "No bookings found "
+      });
+    }
+
+    // Filter out the room the user wants to cancel
+    const updatedRooms = booking.rooms.filter(
+      (room) => room.roomId.toString() !== roomId
+    );
+
+    // If roomId was not found
+    if (updatedRooms.length === booking.rooms.length) {
+      return res.status(404).json({ msg: "This room booking does not exist" });
+    }
+
+    // Update the rooms array
+    booking.rooms = updatedRooms;
+    await booking.save();
+
+    res.status(200).json({
+      msg: "Booking cancelled successfully",
+      updatedBookings: booking
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
+
 module.exports = router;
