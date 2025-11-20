@@ -47,10 +47,12 @@ const Navbar = () => {
 
   const fetchCartCount = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/booking/mybookings", {
+      const res = await axios.get("http://localhost:3000/cart/mycart", {
         headers: { Authorization: token },
       });
-      setCartCount(res.data.data.length);
+      console.log(res, "DATA CART LENGTH");
+
+      setCartCount(res.data.data.rooms.length);
     } catch (error) {
       console.error("Error fetching cart count:", error);
       setCartCount(0);

@@ -11,7 +11,7 @@ export default function Booking() {
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState("");
 
-  // Fetch rooms from backend
+  // Fetch rooms
   useEffect(() => {
     axios
       .get("http://localhost:3000/HotelApi/rooms")
@@ -19,12 +19,10 @@ export default function Booking() {
         setData(response.data);
         setFilteredData(response.data);
       })
-      .catch((error) => {
-        console.error("❌ Error fetching rooms:", error);
-      });
+      .catch(() => {});
   }, []);
 
-  // Search Handler
+  // Search
   const handleSearch = () => {
     const filtered = data.filter((room) => {
       const nameMatch = room.roomName
@@ -36,14 +34,14 @@ export default function Booking() {
     setFilteredData(filtered);
   };
 
-  // Reset Handler
+  // Reset
   const handleReset = () => {
     setSearch("");
     setFilteredData(data);
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-black">
       {/* Navbar */}
       <Suspense
         fallback={
@@ -57,10 +55,10 @@ export default function Booking() {
 
       {/* Main Section */}
       <Suspense fallback={<Loading />}>
-        <div className="text-center mt-[7rem] px-4 pb-16">
-          {/* Hero Title */}
-          <div className="mb-10">
-            <h1 className="text-5xl font-bold mb-3 text-white leading-tight">
+        <div className="text-center mt-[6rem] px-4 pb-24 pt-11">
+          {/* Hero */}
+          <div className="mb-12">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white drop-shadow-lg mb-3 tracking-tight">
               Your Perfect Stay Awaits
             </h1>
             <p className="text-xl text-gray-400">
@@ -70,39 +68,41 @@ export default function Booking() {
           </div>
 
           {/* Search Section */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 max-w-3xl mx-auto">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-14 max-w-3xl mx-auto">
             <input
               type="text"
               placeholder="Search by room name or price..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              className="border-2 border-gray-700 bg-gray-800/70 text-white px-6 py-3.5 rounded-xl 
+              className="border border-gray-700 bg-gray-800/60 text-white px-6 py-3.5 rounded-xl 
               w-full sm:flex-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none 
-              placeholder-gray-500 backdrop-blur-sm transition-all duration-200"
+              placeholder-gray-500 backdrop-blur-md shadow-inner transition-all duration-200"
             />
+
             <button
               onClick={handleSearch}
               className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-3.5 rounded-xl 
-              hover:from-blue-500 hover:to-blue-600 transition-all font-semibold shadow-lg 
-              hover:shadow-blue-500/50 w-full sm:w-auto"
+              font-semibold shadow-lg hover:shadow-blue-600/50 transition-all w-full sm:w-auto"
             >
               🔍 Search
             </button>
+
             <button
               onClick={handleReset}
-              className="bg-gray-700 text-white px-8 py-3.5 rounded-xl hover:bg-gray-600 
-              transition-all font-semibold w-full sm:w-auto"
+              className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-3.5 rounded-xl 
+              font-semibold transition-all w-full sm:w-auto shadow-md"
             >
               ↻ Reset
             </button>
           </div>
 
-          <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent mb-12"></div>
+          {/* Thin gradient line */}
+          <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/60 to-transparent mb-10"></div>
 
           {/* Results Counter */}
           {filteredData.length > 0 && (
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-400 mb-8 text-lg">
               Showing{" "}
               <span className="text-white font-semibold">
                 {filteredData.length}
@@ -111,8 +111,11 @@ export default function Booking() {
             </p>
           )}
 
-          {/* Room Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 max-w-[1400px] mx-auto">
+          {/* Grid */}
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 
+          gap-8 px-4 max-w-[1500px] mx-auto"
+          >
             {filteredData.length > 0 ? (
               filteredData.map((element) => (
                 <Cards
@@ -137,7 +140,7 @@ export default function Booking() {
                   onClick={handleReset}
                   className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-3 
                   rounded-xl hover:from-blue-500 hover:to-blue-600 transition-all font-semibold 
-                  shadow-lg hover:shadow-blue-500/50"
+                  shadow-lg hover:shadow-blue-600/50"
                 >
                   View All Rooms
                 </button>
