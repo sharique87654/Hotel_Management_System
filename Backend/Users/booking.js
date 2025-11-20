@@ -5,29 +5,21 @@ const { bookingdb, roomdata, signupdb } = require("../db");
 const dotenv = require("dotenv");
 dotenv.config();
 
-// Middleware to verify token
+
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization;
   if (!token)
-    return res.status(401).json({
-      msg: "Token missing",
-    });
+    return res.status(401).json({ msg: "Token missing" });
 
   try {
     const decoded = jwt.verify(token, process.env.JwtCode);
-    //(decoded);
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    return res.status(403).json({
-      msg: "invalid Token",
-    });
+    return res.status(403).json({ msg: "Invalid Token" });
   }
 }
 
-
-
-// for booking the rooms
 
 router.post("/book/:roomId", authMiddleware, async (req, res) => {
   try {
@@ -41,11 +33,11 @@ router.post("/book/:roomId", authMiddleware, async (req, res) => {
     const user = await signupdb.findById(req.userId);
     if (!user) return res.status(404).json({ msg: "User not found" });
 
-    // Check if booking doc exists
+    // Find user's booking document
     let userBooking = await bookingdb.findOne({ userId: req.userId });
 
+    // If no document, create one
     if (!userBooking) {
-      // Create new booking document with user info
       userBooking = new bookingdb({
         userId: req.userId,
         userName: `${user.firstname} ${user.lastname}`,
@@ -54,13 +46,15 @@ router.post("/book/:roomId", authMiddleware, async (req, res) => {
       });
     }
 
-    // Push room to array
+    // Add new room to bookings array
     userBooking.rooms.push({
       roomId,
       checkInDate,
       checkOutDate,
       guests,
-      totalPrice
+      totalPrice,
+      status: "booked", // IMPORTANT
+      bookedAt: new Date()
     });
 
     await userBooking.save();
@@ -78,10 +72,6 @@ router.post("/book/:roomId", authMiddleware, async (req, res) => {
 
 
 
-
-// view all booked room by the user....
-
-
 router.get("/mybookings", authMiddleware, async (req, res) => {
   try {
     const booking = await bookingdb
@@ -92,9 +82,15 @@ router.get("/mybookings", authMiddleware, async (req, res) => {
       return res.status(404).json({ msg: "No bookings found" });
     }
 
+    // Filter to show ONLY bookings with status = "booked"
+    const activeRooms = booking.rooms.filter(room => room.status === "booked");
+
     res.status(200).json({
       success: true,
-      data: booking,
+      data: {
+        ...booking.toObject(),
+        rooms: activeRooms
+      }
     });
 
   } catch (err) {
@@ -105,34 +101,29 @@ router.get("/mybookings", authMiddleware, async (req, res) => {
 
 
 
-router.delete("/cancel/:roomId", authMiddleware, async (req, res) => {
+
+router.put("/cancel/:roomId", authMiddleware, async (req, res) => {
   try {
     const { roomId } = req.params;
-    const booking = await bookingdb.findOne({ userId: req.userId });
 
-    if (!booking) {
-      return res.status(404).json({
-        msg: "No bookings found "
-      });
-    }
-
-    // Filter out the room the user wants to cancel
-    const updatedRooms = booking.rooms.filter(
-      (room) => room.roomId.toString() !== roomId
+    const booking = await bookingdb.findOneAndUpdate(
+      {
+        userId: req.userId,
+        "rooms.roomId": roomId
+      },
+      {
+        $set: { "rooms.$.status": "cancel" }
+      },
+      { new: true }
     );
 
-    // If roomId was not found
-    if (updatedRooms.length === booking.rooms.length) {
-      return res.status(404).json({ msg: "This room booking does not exist" });
+    if (!booking) {
+      return res.status(404).json({ msg: "Booking not found" });
     }
-
-    // Update the rooms array
-    booking.rooms = updatedRooms;
-    await booking.save();
 
     res.status(200).json({
       msg: "Booking cancelled successfully",
-      updatedBookings: booking
+      booking
     });
 
   } catch (err) {
@@ -140,7 +131,5 @@ router.delete("/cancel/:roomId", authMiddleware, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
-
 
 module.exports = router;

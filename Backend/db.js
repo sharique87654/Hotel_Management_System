@@ -52,7 +52,12 @@ const BookingSchema = new mongoose.Schema({
       checkOutDate: { type: Date, required: true },
       guests: { type: Number, required: true },
       totalPrice: { type: Number, required: true },
-      bookedAt: { type: Date, default: Date.now }
+      bookedAt: { type: Date, default: Date.now },
+      status: {
+        type: String,
+        enum: ["booked", "cancel"],
+        default: "booked"
+      }
     }
   ]
 });
