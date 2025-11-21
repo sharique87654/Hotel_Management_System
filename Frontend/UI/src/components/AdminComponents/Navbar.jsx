@@ -10,7 +10,7 @@ export default function Navbar() {
   }
   return (
     <div>
-      <div className="flex w-screen flex-row items-center justify-between bg-gradient-to-r from-gray-900 via-black to-gray-800 shadow-xl rounded-b-3xl py-4 px-10">
+      <div className="flex flex-row items-center justify-between bg-gradient-to-r from-gray-900 via-black to-gray-800 shadow-xl rounded-b-3xl py-4 px-10">
         <div className="flex items-center">
           <img
             onClick={() => navigate("/")}
