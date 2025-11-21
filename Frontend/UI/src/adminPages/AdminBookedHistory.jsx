@@ -84,7 +84,7 @@ const AdminBookedHistory = () => {
     return rooms.reduce((total, room) => total + (room.price || 0), 0);
   };
 
-  // Handle cancel booking
+  // Handle cancel booking (entire booking)
   const handleCancelBooking = async (bookingId, guestName) => {
     const result = await Swal.fire({
       title: "Cancel Booking?",
@@ -120,6 +120,49 @@ const AdminBookedHistory = () => {
           icon: "error",
           title: "Cancellation Failed",
           text: error.response?.data?.msg || "Failed to cancel booking",
+        });
+      }
+    }
+  };
+
+  // ✅ Handle cancel individual room
+  const handleCancelRoom = async (bookingId, roomId, roomName, guestName) => {
+    const result = await Swal.fire({
+      title: "Cancel This Room?",
+      html: `Are you sure you want to cancel <strong>${roomName}</strong> for ${guestName}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, Cancel Room",
+      cancelButtonText: "No, Keep It",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:3000/admin/cancelroom/${bookingId}/${roomId}`
+        );
+        console.log({ response });
+
+        if (response.data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Room Cancelled",
+            text:
+              response.data.msg || "The room has been cancelled successfully",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+
+          fetchBookings();
+        }
+      } catch (error) {
+        console.error("Error cancelling room:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Cancellation Failed",
+          text: error.response?.data?.msg || "Failed to cancel room",
         });
       }
     }
@@ -277,12 +320,12 @@ const AdminBookedHistory = () => {
                                   key={index}
                                   className="bg-gray-800/80 border border-gray-700 rounded-lg p-4 hover:border-purple-500/50 transition-all duration-200"
                                 >
-                                  <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
+                                  <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
                                     {/* Room Image & Name */}
                                     <div className="col-span-2 flex items-center gap-3">
-                                      {room.roomId?.imageUrl && (
+                                      {room.imageUrl && (
                                         <img
-                                          src={room.roomId.imageUrl}
+                                          src={room.imageUrl}
                                           alt={room.roomName}
                                           className="w-16 h-16 rounded-lg object-cover border-2 border-gray-600 shadow-md"
                                         />
@@ -295,10 +338,8 @@ const AdminBookedHistory = () => {
                                           {room.roomType}
                                         </p>
                                         <p className="text-xs text-blue-400 mt-1">
-                                          {room.roomId?.numberofbed || 0} Bed
-                                          {room.roomId?.numberofbed !== 1
-                                            ? "s"
-                                            : ""}
+                                          {room.numberofbed || 0} Bed
+                                          {room.numberofbed !== 1 ? "s" : ""}
                                         </p>
                                       </div>
                                     </div>
@@ -350,20 +391,36 @@ const AdminBookedHistory = () => {
                                     </div>
 
                                     {/* Price */}
-                                    <div className="text-right">
+                                    <div className="text-center">
                                       <p className="text-gray-400 text-xs">
                                         Room Price
                                       </p>
                                       <p className="text-green-400 font-bold text-lg">
-                                        ₹
-                                        {room.price?.toLocaleString(
-                                          "en-IN"
-                                        )}
+                                        ₹{room.price?.toLocaleString("en-IN")}
                                       </p>
                                       <p className="text-gray-500 text-xs mt-1">
                                         Booked: {formatDate(room.bookedAt)}
                                       </p>
                                     </div>
+
+                                    {/* ✅ FIXED: Cancel Room Button */}
+                                    {isActive && (
+                                      <div className="text-right">
+                                        <button
+                                          onClick={() =>
+                                            handleCancelRoom(
+                                              booking.bookingId,
+                                              room.roomId,
+                                              room.roomName,
+                                              booking.user.name
+                                            )
+                                          }
+                                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-red-500/50 hover:scale-105 flex items-center gap-2 mx-auto"
+                                        >
+                                          <span>🗑️</span> Cancel Room
+                                        </button>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               ))}

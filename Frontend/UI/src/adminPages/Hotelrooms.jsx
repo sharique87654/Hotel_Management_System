@@ -78,10 +78,10 @@ export default function Hotelrooms() {
         }
       ></Suspense>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-3">
         <div className="max-w-2xl mx-auto">
           {/* Header Section */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 pt-4">
             <h1 className="text-3xl font-bold text-white mb-2">Add New Room</h1>
             <p className="text-gray-400">
               Fill in the details to publish a new hotel room
@@ -94,7 +94,7 @@ export default function Hotelrooms() {
             onSubmit={hotelData}
           >
             {/* Name */}
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block mb-2 text-sm font-semibold text-gray-200">
                 Room Name
               </label>
@@ -111,7 +111,7 @@ export default function Hotelrooms() {
             </div>
 
             {/* Description */}
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block mb-2 text-sm font-semibold text-gray-200">
                 Description
               </label>
@@ -128,7 +128,7 @@ export default function Hotelrooms() {
             </div>
 
             {/* Price */}
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block mb-2 text-sm font-semibold text-gray-200">
                 Price per Night
               </label>
@@ -148,7 +148,7 @@ export default function Hotelrooms() {
             </div>
 
             {/* Upload Image */}
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block mb-2 text-sm font-semibold text-gray-200">
                 Upload Room Image
               </label>
@@ -176,16 +176,19 @@ export default function Hotelrooms() {
                 <label className="block mb-2 text-sm font-semibold text-gray-200">
                   Room Type
                 </label>
-                <input
-                  type="text"
+
+                <select
                   value={roomType}
                   onChange={(e) => setroomType(e.target.value)}
                   className="text-sm rounded-lg block w-full p-3 bg-gray-700 border border-gray-600 
-                  placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent 
-                  transition-all duration-200"
-                  placeholder="e.g., Deluxe, Suite"
+    placeholder-gray-400 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+    transition-all duration-200"
                   required
-                />
+                >
+                  <option value="">Select Room Type</option>
+                  <option value="Basic">BASIC</option>
+                  <option value="Luxury">LUXURY</option>
+                </select>
               </div>
 
               {/* Number of Beds */}

@@ -15,6 +15,7 @@ export default function Modal({ roomData, onClose, onSave }) {
   );
   const [updating, setUpdating] = useState(false);
   const [imagePreview, setImagePreview] = useState(roomData?.imageUrl || "");
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     if (roomData) {
@@ -39,7 +40,49 @@ export default function Modal({ roomData, onClose, onSave }) {
     // Update image preview when URL changes
     if (name === "imageUrl") {
       setImagePreview(value);
+      setSelectedFile(null); // Clear file if URL is being used
     }
+  };
+
+  // ✅ Handle file selection and preview
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid File",
+        text: "Please select an image file (JPG, PNG, GIF, etc.)",
+        timer: 2000,
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire({
+        icon: "error",
+        title: "File Too Large",
+        text: "Please select an image smaller than 5MB",
+        timer: 2000,
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Create preview using FileReader
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+      setFormData((prev) => ({ ...prev, imageUrl: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e) => {
@@ -110,6 +153,7 @@ export default function Modal({ roomData, onClose, onSave }) {
   const handleImageUrlBlur = () => {
     if (
       formData.imageUrl &&
+      !formData.imageUrl.startsWith("data:image") && // Allow base64
       !formData.imageUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)
     ) {
       Swal.fire({
@@ -196,18 +240,38 @@ export default function Modal({ roomData, onClose, onSave }) {
             required
           />
 
+          {/* ✅ NEW: File Upload Option */}
           <label className="block mb-2 font-medium text-gray-700">
-            Room Image URL
+            Room Image
+          </label>
+          <div className="mb-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Or enter image URL below (Max size: 5MB)
+            </p>
+          </div>
+
+          <label className="block mb-2 font-medium text-gray-700">
+            Room Image URL (Optional)
           </label>
           <input
             name="imageUrl"
             type="url"
-            value={formData.imageUrl || ""}
+            value={
+              formData.imageUrl && !formData.imageUrl.startsWith("data:image")
+                ? formData.imageUrl
+                : ""
+            }
             onChange={handleChange}
             onBlur={handleImageUrlBlur}
             className="w-full border border-gray-300 p-2 mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder="https://example.com/image.jpg"
-            required
+            disabled={selectedFile !== null}
           />
 
           {/* Image Preview */}
@@ -223,13 +287,13 @@ export default function Modal({ roomData, onClose, onSave }) {
                   className="w-full h-48 object-cover rounded-lg border-2 border-gray-300 shadow-sm"
                   onError={(e) => {
                     e.target.src =
-                      "https://via.placeholder.com/400x300?text=Invalid+Image+URL";
+                      "https://via.placeholder.com/400x300?text=Invalid+Image";
                     e.target.className =
                       "w-full h-48 object-cover rounded-lg border-2 border-red-300";
                   }}
                 />
                 <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-md shadow text-xs text-gray-600">
-                  ✓ Image loaded
+                  ✓ {selectedFile ? "File uploaded" : "Image loaded"}
                 </div>
               </div>
             ) : (
@@ -248,7 +312,7 @@ export default function Modal({ roomData, onClose, onSave }) {
                   />
                 </svg>
                 <span className="text-gray-400 text-sm">
-                  Enter image URL to preview
+                  Upload file or enter URL
                 </span>
               </div>
             )}
@@ -257,7 +321,8 @@ export default function Modal({ roomData, onClose, onSave }) {
           {/* Helper text */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
             <p className="text-xs text-blue-800">
-              💡 <strong>Tip:</strong> Use image hosting services like{" "}
+              💡 <strong>Tip:</strong> You can either upload an image file
+              directly or use image hosting services like{" "}
               <a
                 href="https://imgbb.com/"
                 target="_blank"
@@ -283,8 +348,8 @@ export default function Modal({ roomData, onClose, onSave }) {
                 className="underline"
               >
                 Cloudinary
-              </a>{" "}
-              to upload images and get URLs.
+              </a>
+              .
             </p>
           </div>
 
