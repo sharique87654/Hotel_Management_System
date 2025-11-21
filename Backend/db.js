@@ -4,7 +4,7 @@ dotenv.config();
 
 mongoose.connect(process.env.MONGO_URL);
 
-const Userschema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   firstname: String,
   lastname: String,
   email: String,
@@ -16,7 +16,7 @@ const AdminSchema = new mongoose.Schema({
   password: String,
 });
 
-const RoomsData = new mongoose.Schema({
+const RoomSchema = new mongoose.Schema({
   roomName: String,
   description: String,
   price: Number,
@@ -94,9 +94,9 @@ const CartSchema = new mongoose.Schema({
 
 
 
-const signupdb = mongoose.model("users", Userschema);
+const signupdb = mongoose.model("users", UserSchema);
 const admindb = mongoose.model("Admin", AdminSchema);
-const roomdata = mongoose.model("Rooms", RoomsData);
+const roomdata = mongoose.model("Rooms", RoomSchema);
 const bookingdb = mongoose.model('BookedRooms', BookingSchema);
 const cartdb = mongoose.model("cart", CartSchema)
 
