@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { bookingdb } = require("../db");
 
-// ✅ Route: Get all bookings (Admin Panel)
+
 router.get("/allBookings", async (req, res) => {
   try {
     const bookings = await bookingdb
@@ -27,10 +27,11 @@ router.get("/allBookings", async (req, res) => {
         roomName: room.roomId?.roomName,
         roomType: room.roomId?.roomType,
         price: room.roomId?.price,
+        imageUrl: room.roomId?.imageUrl,
         guests: room.guests,
         checkInDate: room.checkInDate,
         checkOutDate: room.checkOutDate,
-        status: room.status,       // 👉 ADMIN CAN SEE STATUS HERE
+        status: room.status,      
         bookedAt: room.bookedAt,
       })),
     }));
