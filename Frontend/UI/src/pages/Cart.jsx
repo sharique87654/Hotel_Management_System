@@ -36,6 +36,7 @@ export default function Cart() {
           roomId: room.roomId,
         }));
 
+        console.log(roomsArray, "responseeee");
 
         setCartItems(roomsArray);
       } else {
@@ -104,12 +105,10 @@ export default function Cart() {
     return cartItems.reduce((total, item) => total + (item.totalPrice || 0), 0);
   };
 
-  const calcTax = () => {
-    return calcSubtotal() * 0.12;
-  };
+  
 
   const calcTotal = () => {
-    return calcSubtotal() + calcTax();
+    return calcSubtotal();
   };
 
   const handleCheckout = async () => {
@@ -320,12 +319,6 @@ export default function Cart() {
                   </span>
                 </div>
 
-                <div className="flex justify-between text-slate-300 text-lg">
-                  <span>Tax (12%):</span>
-                  <span className="text-white font-semibold">
-                    ₹{Math.round(calcTax()).toLocaleString()}
-                  </span>
-                </div>
 
                 <div className="border-t border-slate-600 pt-4">
                   <div className="flex justify-between">

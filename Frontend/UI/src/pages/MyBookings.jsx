@@ -30,6 +30,7 @@ export default function MyBookings() {
       const res = await axios.get("http://localhost:3000/booking/mybookings", {
         headers: { Authorization: token },
       });
+      console.log(res, "myboiking response");
 
       if (res.data && res.data.success && res.data.data) {
         const roomsArray = res.data.data.rooms || [];
@@ -292,37 +293,6 @@ export default function MyBookings() {
                             <p className="text-green-400 text-2xl font-bold">
                               ₹{subtotal.toLocaleString()}
                             </p>
-                          </div>
-                        </div>
-
-                        <div className="bg-slate-700/40 p-5 rounded-lg border border-blue-500/20">
-                          <h3 className="text-white text-xl font-bold mb-3">
-                            Price Breakdown
-                          </h3>
-
-                          <div className="flex justify-between text-slate-300 mb-2 text-lg">
-                            <span>Subtotal:</span>
-                            <span className="text-white font-semibold">
-                              ₹{subtotal.toLocaleString()}
-                            </span>
-                          </div>
-
-                          <div className="flex justify-between text-slate-300 mb-2 text-lg">
-                            <span>Tax (12%):</span>
-                            <span className="text-white font-semibold">
-                              ₹{tax.toLocaleString()}
-                            </span>
-                          </div>
-
-                          <div className="border-t border-slate-600 pt-3 mt-3">
-                            <div className="flex justify-between text-xl">
-                              <span className="text-green-400 font-bold">
-                                Grand Total:
-                              </span>
-                              <span className="text-green-400 font-bold">
-                                ₹{grandTotal.toLocaleString()}
-                              </span>
-                            </div>
                           </div>
                         </div>
                       </div>
