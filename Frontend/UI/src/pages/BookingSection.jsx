@@ -133,7 +133,8 @@ export default function BookingSection() {
   return (
     <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen">
       <Navbar />
-      <div className="container mx-auto px-4 py-8 mt-20">
+
+      <div className="container mx-auto px-4 py-8 pt-24 mt-6">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Room Image */}
           <div>
@@ -142,19 +143,23 @@ export default function BookingSection() {
                 image ||
                 "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop"
               }
-              className="w-full h-96 object-cover rounded-xl shadow-2xl"
+              className="w-full h-60 object-cover rounded-xl shadow-2xl"
               alt={roomName}
               onError={(e) => {
                 e.target.src =
                   "https://plus.unsplash.com/premium_photo-1661964402307-02267d1423f5?q=80&w=1973&auto=format&fit=crop";
               }}
             />
-            <div className="mt-6 bg-slate-800 p-6 rounded-xl border border-blue-500/30">
+            <div className="mt-6 bg-slate-800 p-6 rounded-xl border border-blue-500/30 shadow-lg">
               <h2 className="text-2xl font-bold text-white mb-4">{roomName}</h2>
-              <p className="text-slate-300 mb-4">{description}</p>
+              <p className="text-slate-300 mb-4 leading-relaxed">
+                {description}
+              </p>
               <div className="flex justify-between text-white">
-                <span>🏷️ {roomType}</span>
-                <span>🛏️ {noOfBed} Beds</span>
+                <span className="flex items-center gap-2">🏷️ {roomType}</span>
+                <span className="flex items-center gap-2">
+                  🛏️ {noOfBed} Beds
+                </span>
               </div>
               <div className="mt-4 text-3xl text-green-400 font-bold">
                 ₹{price} / night
@@ -163,7 +168,7 @@ export default function BookingSection() {
           </div>
 
           {/* Booking Form */}
-          <div className="bg-slate-800 p-8 rounded-xl border border-blue-500/30">
+          <div className="bg-slate-800 p-8 rounded-xl border border-blue-500/30 shadow-2xl">
             <h2 className="text-3xl text-white font-bold mb-6">
               Book Your Stay
             </h2>
