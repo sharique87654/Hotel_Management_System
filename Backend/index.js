@@ -9,7 +9,8 @@ const bookingRouter = require("./Users/booking.js")
 const addRooms = require("./Admin/addRooms.js")  
 const adminViewBookings = require("./Admin/viewBooking.js");
 const adminCancelBooking = require("./Admin/cancelBooking.js");
-const cart = require("./Users/cart.js")
+const cancelBookedRoom = require("./Admin/cancelBookedRoom.js")
+const usercart = require("./Users/cart.js")
 
 
 const cors = require("cors")
@@ -26,9 +27,10 @@ app.use('/admin' , deleteRooms)
 app.use('/admin' , updateRooms)
 app.use('/admin' , adminViewBookings)
 app.use("/admin" , adminCancelBooking)
+app.use("/admin" , cancelBookedRoom)
 app.use('/HotelApi' , allHotelData)
 app.use('/booking' , bookingRouter)
-app.use('/cart', cart)
+app.use('/cart', usercart)
 
 app.listen(3000 , function(){
     console.log("Everything is working fine");

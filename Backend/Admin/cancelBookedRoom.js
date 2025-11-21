@@ -1,3 +1,7 @@
+const express = require ("express");
+const router = express.Router();
+const {bookingdb , roomdata} = require ("../db")
+
 // Cancel a specific room inside a user's booking (admin)
 router.delete("/cancelroom/:bookingId/:roomId", async (req, res) => {
     try {
@@ -46,3 +50,5 @@ router.delete("/cancelroom/:bookingId/:roomId", async (req, res) => {
         return res.status(500).json({ msg: "Server error" });
     }
 });
+
+module.exports = router;

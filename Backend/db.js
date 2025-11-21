@@ -29,7 +29,6 @@ const RoomsData = new mongoose.Schema({
 
 // ==================== BOOKING MODEL ====================
 
-
 const BookingSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
